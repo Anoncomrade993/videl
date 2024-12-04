@@ -1,0 +1,25 @@
+{
+  "name": "videl",
+  "version": "0.0.1",
+  "description": "you would never know unless you check iy",
+  "main": "./src/www/bin/server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anoncomrade993/videl.git"
+  },
+  "keywords": [
+    "nah",
+    "i",
+    "would",
+    "win"
+  ],
+  "author": "mockingbugs",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anoncomrade993/videl/issues"
+  },
+  "homepage": "https://github.com/anoncomrade993/videl#readme"
+}
