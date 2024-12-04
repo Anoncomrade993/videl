@@ -1,6 +1,6 @@
 const { config } = require('dotenv');
 const SibApiV3Sdk = require('sib-api-v3-sdk');
-const { verifyEmail, changeEmail, forgotPassword, changePassword } = require('../shared/templates.js');
+const {deletUser, verifyEmail, changeEmail, forgotPassword, changePassword } = require('../shared/templates.js');
 
 
 // Initialize the API client
