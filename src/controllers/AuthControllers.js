@@ -419,10 +419,13 @@ module.exports.deleteUser = async function(req, res) {
 		if (!isPassword) {
 			return sendJsonResponse(res, 400, false, 'Current password mismatched')
 		}
-		isUser.onKillList = true;
-		await isUser.save();
 		const now = Date.now();
 		const tweeks = new Date(now + (14 * 24 * 3600 * 1000))
+
+		isUser.onKillList = true;
+		isUser.killDate = tweeks;
+		await isUser.save();
+
 		await sendDeleteUserEmail(isUser.email, { username: isUser.username, message: tweeks.toUTCString(), token: plain })
 		return sendJsonResponse(res, 200, true, 'account deletion scheduled successfully')
 	} catch (error) {

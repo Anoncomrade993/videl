@@ -18,12 +18,13 @@ const userSchema = new mongoose.Schema({
 		}
 	},
 	password: { type: String, required: true },
-	avatar: { type: String, required: true },
+	avatar: { type: String, required: false },
 	isVerified: { type: Boolean, default: false },
 	onKillList: {
 		type: Boolean,
 		default: false
 	},
+	killDate: { type: Date, default: null },
 	links: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Link' }]
 }, { timestamps: true })
 
