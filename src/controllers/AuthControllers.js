@@ -42,7 +42,7 @@ module.exports.registerUser = async function(req, res) {
 		if (!created) {
 			return sendJsonResponse(res, 500, false, 'Internal server error occurred ')
 		}
-		
+
 		req.session.user = {
 			email: user.email,
 			userId: user._id,
@@ -50,7 +50,7 @@ module.exports.registerUser = async function(req, res) {
 			isVerified: user.isVerified
 		}
 		await saveSession(req);
-		
+
 		// Send verification email
 		await sendVerifyEmail(user.email, { username, token: plain });
 
@@ -216,16 +216,17 @@ module.exports.changePassword = async function(req, res) {
 		if (!success) {
 			return sendJsonResponse(res, 404, false, 'Token invalid or expired')
 		}
-
-		const isCurrPassword = await isUser.comparePassword(newPassword);
-		if (isCurrPassword) {
-			return sendJsonResponse(res, 400, false, 'New password shouldn\'t match current one')
-		}
-
 		const isPassword = await isUser.comparePassword(currPassword);
 		if (!isPassword) {
 			return sendJsonResponse(res, 400, false, 'Current password mismatched')
 		}
+
+		const isSamePassword = await isUser.comparePassword(newPassword);
+		if (isSamePassword) {
+			return sendJsonResponse(res, 400, false, 'New password shouldn\'t match current one')
+		}
+
+
 
 		isUser.password = await Scrypt.verifyToken(newPassword);
 		await isUser.save()
