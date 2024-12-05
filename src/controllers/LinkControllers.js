@@ -1,6 +1,7 @@
 const User = require('../models/User.js')
 const Link = require('../models/Link.js')
 const Capture = require('../models/Capture.js')
+const Template = require('../models/Template.js')
 const { uploadCaptureFile } = require('../services/FireBase.js')
 const { sendJsonResponse } = require('../utility/helpers.js')
 
@@ -11,13 +12,19 @@ module.exports.generateLink = async function(req, res) {
 		if (!user || Object.keys(user).length === 0) {
 			return sendJsonResponse(res, 401, false, 'You are not authenticated')
 		}
+		const { templateId } = req.body;
 
+		if (!templateId.trim()) {
+			return sendJsonResponse(res, 400, false, 'provide a valid template ID')
+		}
+		
 		const isUser = await User.findById(user.userId);
 		if (!isUser) {
 			return sendJsonResponse(res, 404, false, 'User not found')
 		}
 
-		const { success, status, message, link } = await Link.createLink(user.userId);
+
+		const { success, status, message, link } = await Link.createLink(user.userId,templateId);
 		if (!success) {
 			return sendJsonResponse(res, status, success, message);
 		}

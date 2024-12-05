@@ -2,10 +2,11 @@ const mongoose = require('mongoose');
 const { generate } = require('../utility/helpers.js')
 //videl
 // vdl => sigil letters 
-//19 + 13 = 32/2 = 16 letter length 
+//12+4+ 22 = 38/2 = 19 letter length 
 
 const linkSchema = new mongoose.Schema({
 	user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+	templateId: { type: String, required: true, immutable: true },
 	captures: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Captures' }],
 	linkId: { type: String, required: true, unique: true, immutable: true },
 	isSuspended: { type: Boolean, default: false }
@@ -24,13 +25,13 @@ linkSchema.virtual('captureCount').get(function() {
 	return this.captures ? this.captures.length : 'No captures';
 });
 
-linkSchema.statics.createLink = async function(user) {
+linkSchema.statics.createLink = async function(user, templateId = '') {
 	try {
-		if (!user) {
+		if (!user || !templateId.trim()) {
 			return { success: falses, status: 400, message: "missing fields", link: null }
 		}
-		const linkId = generate(16);
-		const link = await this.create({ user, linkId });
+		const linkId = generate(19);
+		const link = await this.create({ user, linkId,templateId });
 		if (!link) {
 			return { success: false, status: 500, message: _, link: null }
 		}
