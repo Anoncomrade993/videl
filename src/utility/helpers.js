@@ -18,13 +18,8 @@ function sendJsonResponse(res, status, success, message, data) {
 	return res.status(status).json(response);
 }
 
-function renderUi(path = '', data = {}) {
-	return function(req, res) {
-		return res.render(path, { data })
-	}
-}
+
 module.exports = {
 	generate,
-	sendJsonResponse,
-	renderUi
+	sendJsonResponse
 }

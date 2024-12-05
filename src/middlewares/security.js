@@ -6,6 +6,7 @@
  * @Author - MockingBugs
  */
 require('dotenv').config();
+const rateLimit = require('express-rate-limiter')
 const { sendJsonResponse } = require('../utility/helpers.js')
 const { logAuditAction } = require('./audit.js')
 
@@ -55,4 +56,22 @@ module.exports.attackMiddleware = async function(req, res, next) {
 		return sendJsonResponse(res, 403, false, 'Access denied DickHead !!!');
 	}
 	next();
+};
+
+
+
+module.exports.tokenRequestLimiter = () => {
+	return rateLimit({
+		windowMs: 10 * 60 * 1000, //10min cool down 
+		max: 15, // max numbers of request 
+		message: 'Too many token requests, please try again later',
+		standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+		legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+		handler: (req, res) => {
+			res.status(429).json({
+				error: 'Too many requests, please try again later',
+				blockedAt: new Date().toISOString()
+			});
+		}
+	});
 };

@@ -52,7 +52,9 @@ module.exports.registerUser = async function(req, res) {
 			email: user.email,
 			userId: user._id,
 			lastLogin: null,
-			isVerified: user.isVerified
+			lastAccess: new Date(),
+			isVerified: user.isVerified,
+			username: user.username
 		}
 		await saveSession(req);
 
@@ -123,7 +125,9 @@ module.exports.loginUser = async function(req, res) {
 			email: isUser.email,
 			userId: isUser._id,
 			lastLogin: new Date(),
-			isVerified: isUser.isVerified
+			isVerified: isUser.isVerified,
+			lastAccess: new Date(),
+			username: isUser.username
 		}
 
 		await saveSession(req);

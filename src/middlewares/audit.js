@@ -60,32 +60,10 @@ function getErrorMessage(statusCode) {
 }
 
 
-// Error handler with auditing
-const errorHandler = async function(err, req, res, next) {
-	console.error('Error occurred:', err); // Log the error
 
-	const statusCode = err.status || 500;
-	const message = getErrorMessage(statusCode);
-
-
-	await logAuditAction(
-		req.session?.user?.userId || "",
-		req.path,
-		req.ip,
-		req.get('User-Agent'),
-		'failure', { error: err.message, stack: err.stack }
-	);
-
-	//if sent from non-browser environment 
-	if (req.xhr || req.accepts('json')) {
-		return res.status(statusCode).json({ status: 'error', message });
-	}
-	res.status(500).json({ error: 'An unexpected error occurred' });
-	next();
-};
 
 module.exports = {
 	auditMiddleware,
-	errorHandler,
+	getErrorMessage,
 	logAuditAction
 };

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 
 const apiAuditSchema = new mongoose.Schema({
 	userId: {
-		type: String,
+		type: mongoose.Schema.Types.Mixed,
 		index: true,
 		default: null
 	},

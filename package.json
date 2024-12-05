@@ -44,6 +44,7 @@
 		"xss-clean": "^0.1.4",
 		"hpp": "^0.2.3",
 		"file-type": "^16.5.4",
+		"ejs":"^3.1.10",
 		"express-mongo-sanitize": "^2.2.0"
 	}
 }

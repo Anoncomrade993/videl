@@ -19,6 +19,8 @@ const {
 	cancelDeleteUser
 } = require('../controllers/AuthControllers.js')
 
+const { tokenRequestLimiter } = require('../middlewares/security.js')
+
 
 authRouter.post('/register', registerUser);
 authRouter.post('/verification', emailVerification)
@@ -29,10 +31,10 @@ authRouter.post('/change_password', requireAuth, changePassword)
 authRouter.post('/request_user_delete', requireAuth, deleteUser)
 authRouter.post('/cancel_user_delete', cancelDeleteUser)
 
-authRouter.post('/request-fp-token', request_fp_OTP)
-authRouter.post('/request-ev-token', request_ev_OTP)
-authRouter.post('/request-ce-token', requireAuth, request_ce_OTP)
-authRouter.post('/request-cp-token', requireAuth, request_cp_OTP)
+authRouter.post('/request-fp-token', tokenRequestLimiter, request_fp_OTP)
+authRouter.post('/request-ev-token', tokenRequestLimiter, request_ev_OTP)
+authRouter.post('/request-ce-token', tokenRequestLimiter, requireAuth, request_ce_OTP)
+authRouter.post('/request-cp-token', tokenRequestLimiter, requireAuth, request_cp_OTP)
 
 auth.get('/profile', requireAuth, getUserProfile)
 
