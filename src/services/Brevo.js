@@ -22,6 +22,11 @@ const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 async function sendEmail(recipientEmail, subject, template, data = {}) {
 	const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
+	data.twitter = process.env.TWITTER;
+	data.telegram = process.env.TELEGRAM
+	data.contact = process.env.CONTACT;
+	data.privacy = process.env.PRIVACY;
+
 
 	const htmlContent = template(data);
 
