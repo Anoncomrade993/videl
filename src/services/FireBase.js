@@ -7,15 +7,7 @@ const fileType = require('file-type');
 const admin = require('firebase-admin');
 
 const UPLOAD_STORAGE = process.env.UPLOAD_STORAGE;
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-	apiKey: "AIzaSyBe4OYwYqSPhw9NPy7Icl-zOLGGqb3pOII",
-	authDomain: "mockinbugslabs.firebaseapp.com",
-	projectId: "mockinbugslabs",
-		messagingSenderId: "1067004858149",
-	appId: "1:1067004858149:web:a511d8872320bac2d814cc",
-	measurementId: "G-T1NHPP9ZNJ"
-};
+
 // Initialize Firebase Admin
 const serviceAccount = require('../config/serv.js');
 admin.initializeApp({

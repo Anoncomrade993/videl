@@ -1,3 +1,4 @@
 module.exports = {
-	EMAIL_REGEX :  /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
+	FILE_LIMIT: (5 * 1024 * 1024),
+	EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
 }

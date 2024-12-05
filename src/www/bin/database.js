@@ -6,15 +6,15 @@ const mongoose = require('mongoose')
 
 async function connectToDb() {
 	try {
-		const { DATABASE_URL, NODE_ENV } = process.env;
+		const { MONGODB_URI, NODE_ENV } = process.env;
 
-		if (!DATABASE_URL) {
-			throw new Error('DATABASE_URL is not defined in environment variables');
+		if (!MONGODB_URI) {
+			throw new Error('MONGODB_URI is not defined in environment variables');
 		}
 
 
 
-		await mongoose.connect(DATABASE_URL);
+		await mongoose.connect(MONGODB_URI);
 
 		if (NODE_ENV !== 'production') {
 			mongoose.set('debug', true);

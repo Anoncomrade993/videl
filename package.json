@@ -1,25 +1,49 @@
 {
-  "name": "videl",
-  "version": "0.0.1",
-  "description": "you would never know unless you check it",
-  "main": "./src/www/bin/server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/anoncomrade993/videl.git"
-  },
-  "keywords": [
+	"name": "videl",
+	"version": "0.0.1",
+	"description": "you would never know unless you check it",
+	"main": "./src/www/bin/server.js",
+	"scripts": {
+		"start": "node src/www/bin/server.js",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/anoncomrade993/videl.git"
+	},
+	"keywords": [
     "nah",
     "i",
     "would",
     "win"
   ],
-  "author": "mockingbugs",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/anoncomrade993/videl/issues"
-  },
-  "homepage": "https://github.com/anoncomrade993/videl#readme"
+	"author": "mockingbugs(alias=> Dessxvii,Anoncomrade)",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/anoncomrade993/videl/issues"
+	},
+	"homepage": "https://github.com/anoncomrade993/videl#readme",
+	"dependencies": {
+		"axios": "^1.7.7",
+		"body-parser": "^1.20.3",
+		"compression": "^1.7.4",
+		"connect-mongo": "^5.1.0",
+		"cookie-parser": "^1.4.6",
+		"cors": "^2.8.5",
+		"dotenv": "^16.4.5",
+		"express": "^4.21.0",
+		"express-rate-limit": "^7.4.0",
+		"express-session": "^1.18.0",
+		"firebase-admin": "^12.5.0",
+		"helmet": "^7.1.0",
+		"mongoose": "^8.6.3",
+		"morgan": "^1.10.0",
+		"multer": "^1.4.5-lts.1",
+		"sharp": "^0.33.5",
+		"sib-api-v3-sdk": "^8.5.0",
+		"xss-clean": "^0.1.4",
+		"hpp": "^0.2.3",
+		"file-type": "^16.5.4",
+		"express-mongo-sanitize": "^2.2.0"
+	}
 }

@@ -1,5 +1,6 @@
 const Token = require('../models/Token.js')
 const User = require('../models/User.js')
+const Schedule = require('../models/Schedule.js')
 const Scrypt = require('../services/Scrypt.js')
 const { sendJsonResponse } = require('../utility/helpers.js')
 const { EMAIL_REGEX } = require('../constants.js')
@@ -12,11 +13,13 @@ const {
 } = require('../services/Brevo.js');
 
 const { saveSession, destroySession } = require('../middlewares/session.js')
+const generateAvatar = require('../identicons/generator.js')
+
 
 module.exports.registerUser = async function(req, res) {
 	try {
 		const { email, username, password } = req.body
-
+		let avatar = null;
 		// Validate input
 		if (!email.trim() || !username.trim() || !password.trim()) {
 			return sendJsonResponse(res, 400, false, 'Provide credentials to create an account')
@@ -29,8 +32,10 @@ module.exports.registerUser = async function(req, res) {
 		if (exists) {
 			return sendJsonResponse(res, 400, false, 'Email in use')
 		}
+		avatar = generateAvatar(username);
+
 		// Create user
-		const { success, message, user } = await User.createUser({ email, password, username })
+		const { success, message, user } = await User.createUser({ email, password, username, avatar })
 		if (!success) return sendJsonResponse(res, 500, false, message)
 
 		// Generate verification token
@@ -419,13 +424,15 @@ module.exports.deleteUser = async function(req, res) {
 		if (!isPassword) {
 			return sendJsonResponse(res, 400, false, 'Current password mismatched')
 		}
-		const now = Date.now();
-		const tweeks = new Date(now + (14 * 24 * 3600 * 1000))
+
+		const tweeks = new Date(Date.now() + (14 * 24 * 3600 * 1000))
+		const { success, status, message } = await Schedule.createSchedule(isUser._id);
+		if (!success) {
+			return sendJsonResponse(res, status, success, message)
+		}
 
 		isUser.onKillList = true;
-		isUser.killDate = tweeks;
 		await isUser.save();
-
 		await sendDeleteUserEmail(isUser.email, { username: isUser.username, message: tweeks.toUTCString(), token: plain })
 		return sendJsonResponse(res, 200, true, 'account deletion scheduled successfully')
 	} catch (error) {
@@ -461,6 +468,10 @@ module.exports.cancelDeleteUser = async function(req, res)
 		const { success, status, message } = await Token.verifyToken({ email: isUser.email, purpose: 'deleteUser', token })
 		if (!success) {
 			return sendJsonResponse(res, status, success, message)
+		}
+		const { success: isCancelled } = await Schedule.cancelSchedule(isUser._id)
+		if (!isCancelled) {
+			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
 		}
 		isUser.onKillList = false;
 		await isUser.save();

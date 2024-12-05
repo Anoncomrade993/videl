@@ -15,6 +15,8 @@ const {
 	suspendLink
 } = require('../controllers/LinkControllers.js')
 
+const fileHandler = require('../middlewares/file.js')
+
 const upload = multer({
 	storage: multer.memoryStorage(),
 	limits: {
@@ -24,7 +26,7 @@ const upload = multer({
 
 
 linkRouter.post('/generate', requireAuth, generateLink)
-linkRouter.post('/:linkId/sere', upload.single('file'), captureDummy)
+linkRouter.post('/:linkId/sere', fileHandler, upload.single('file'), captureDummy)
 linkRouter.get('/:linkId/captures', requireAuth, getCaptures)
 linkRouter.get('/:linkId/captures/:captureId', requireAuth, getCapture)
 linkRouter.get('/:linkId/captures/export', requireAuth, exportCaptures)

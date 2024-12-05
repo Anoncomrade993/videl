@@ -27,7 +27,7 @@ authRouter.post('/signout', requireAuth, logoutUser)
 authRouter.post('/change_email', requireAuth, changeEmail)
 authRouter.post('/change_password', requireAuth, changePassword)
 authRouter.post('/request_user_delete', requireAuth, deleteUser)
-authRouter.post('/cancel_user_delete', cancelAnimationFrame)
+authRouter.post('/cancel_user_delete', cancelDeleteUser)
 
 authRouter.post('/request-fp-token', request_fp_OTP)
 authRouter.post('/request-ev-token', request_ev_OTP)

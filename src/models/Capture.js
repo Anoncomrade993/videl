@@ -85,6 +85,7 @@ const entropySignatureSchema = new mongoose.Schema({
 
 const captureSchema = new mongoose.Schema({
 	captureId: String,
+	linkId: { type: String, required: true },
 	rawFingerprint: {
 		hardwareSignature: hardwareSignatureSchema,
 		browserEnvironment: browserEnvironmentSchema,
@@ -97,13 +98,13 @@ const captureSchema = new mongoose.Schema({
 	},
 	computedHash: String,
 	confidence: Number,
-	mediaUrl: { type: String, immutable : true},
+	mediaUrl: { type: String, immutable: true },
 	hasMedia: { Boolean, default: false }
 }, {
 	timestamps: true
 });
 
 // Index on the computedHash for faster lookups
-captureSchema.index({ computedHash: 1 }, { expiresAfterSeconds: 20 * 3600 /*20hrs expiration*/ });
+captureSchema.index({ computedHash: 1 }, { expiresAfterSeconds: 24 * 3600 /*24hrs expiration*/ });
 
 module.exports = mongoose.model('Capture', captureSchema);

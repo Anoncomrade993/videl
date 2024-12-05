@@ -50,6 +50,7 @@ userSchema.methods.comparePassword = async function(password = '') {
 		return isPassword;
 	} catch (error) {
 		console.error('Error comparing password', error)
+		throw error
 	}
 }
 

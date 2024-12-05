@@ -12,7 +12,7 @@ const linkSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Index on the createdAt for faster lookups with 24-hour expiration
-linkSchema.index({ createdAt: 1 }, { expiresAfterSeconds: 24 * 3600 });
+linkSchema.index({ createdAt: 1 });
 
 // Create indexes to improve query performance
 linkSchema.index({ linkId: 1 });
@@ -43,7 +43,7 @@ linkSchema.statics.createLink = async function(user) {
 
 linkSchema.statics.suspendLink = async function(linkId = '') {
 	try {
-		const link = this.findOne({ linkId });
+		const link = await this.findOne({ linkId });
 		if (!link) {
 			return { success: false, message: "link not found", isSuspended: false }
 		}
@@ -55,17 +55,15 @@ linkSchema.statics.suspendLink = async function(linkId = '') {
 	}
 }
 
-// Static method to retrieve all captures for a link
 linkSchema.statics.getCaptures = async function(linkId) {
 	try {
-		// Find the link and populate captures
 		const link = await this.findOne({ linkId })
 			.populate({
 				path: 'captures',
-				model: 'Captures', //Capture model name
+				model: 'Capture',
 				options: {
-					sort: { createdAt: -1 }, // Sort by most recent first
-					limit: 50 // Limit to prevent overwhelming results
+					sort: { createdAt: -1 },
+					limit: 50
 				}
 			});
 
@@ -84,10 +82,8 @@ linkSchema.statics.getCaptures = async function(linkId) {
 	}
 };
 
-// Static method to retrieve a specific capture
 linkSchema.statics.getCapture = async function(linkId, captureId) {
 	try {
-		// Find the link and verify the capture belongs to this link
 		const link = await this.findOne({
 			linkId,
 			captures: mongoose.Types.ObjectId(captureId)
@@ -103,7 +99,7 @@ linkSchema.statics.getCapture = async function(linkId, captureId) {
 
 		return {
 			link: link,
-			capture: link.captures[0] // Will be the specific capture
+			capture: link.captures[0]
 		};
 	} catch (e) {
 		console.error('Error retrieving specific capture:', e);
@@ -111,7 +107,6 @@ linkSchema.statics.getCapture = async function(linkId, captureId) {
 	}
 };
 
-// Optional: Method to add a new capture to the link
 linkSchema.methods.addCapture = async function(captureId) {
 	try {
 		// Prevent duplicate captures
