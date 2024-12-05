@@ -56,7 +56,8 @@ module.exports = {
 	    		<p>Hello 👋,${data.username}</p>
 	    		<p>We've received your request to delete your account. Your account is scheduled for deletion in 14 days.</p>
 	    		<p>If you've changed your mind and want to keep your account, please click the button below:</p>
-	    		<p><a href="${data.token}" class="button">Cancel Deletion</a></p>
+	    		<p>${data.token}</p>
+	    		<p> <a class='button' href='${data.url}'>Cancel Schedule</a></p>
 	    		<p>If you take no action, your account and all associated data will be permanently deleted on ${data.date}.</p>
 	    		<p>We're sorry to see you go. If you have any feedback, please let us know.</p>
 	    		<p>Best regards,<br>Videl Team.</p>
@@ -160,7 +161,8 @@ module.exports = {
 	</body>
 	
 	</html>`,
-	forgotPassword: (data = {}) => `<!DOCTYPE html>
+	forgotPassword: (data = {}) => `
+	<!DOCTYPE html>
 	<html lang="en">
 	
 	<head>
@@ -247,7 +249,8 @@ module.exports = {
 	</body>
 	
 	</html>`,
-	changeEmail: (data = {}) => `<!DOCTYPE html>
+	changeEmail: (data = {}) => `
+	<!DOCTYPE html>
 	<html lang="en">
 	
 	<head>
@@ -333,7 +336,8 @@ module.exports = {
 	</body>
 	
 	</html>`,
-	verifyEmail: (data = {}) => `<!DOCTYPE html>
+	verifyEmail: (data = {}) => `
+	<!DOCTYPE html>
 	<html lang="en">
 	
 	<head>

@@ -433,7 +433,7 @@ module.exports.deleteUser = async function(req, res) {
 
 		isUser.onKillList = true;
 		await isUser.save();
-		await sendDeleteUserEmail(isUser.email, { username: isUser.username, message: tweeks.toUTCString(), token: plain })
+		await sendDeleteUserEmail(isUser.email, { username: isUser.username, date: tweeks.toUTCString(), token: plain, url: '' })
 		return sendJsonResponse(res, 200, true, 'account deletion scheduled successfully')
 	} catch (error) {
 		console.error('Error changing user password', error)
