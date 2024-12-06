@@ -37,7 +37,7 @@ authRouter.post('/request-ev-token', tokenRequestLimiter, request_ev_OTP)
 authRouter.post('/request-ce-token', tokenRequestLimiter, requireAuth, request_ce_OTP)
 authRouter.post('/request-cp-token', tokenRequestLimiter, requireAuth, request_cp_OTP)
 
-auth.get('/profile', requireAuth, getUserProfile)
+authRouter.get('/profile', requireAuth, getUserProfile)
 
 
 
