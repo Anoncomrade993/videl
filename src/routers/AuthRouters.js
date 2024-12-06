@@ -16,6 +16,7 @@ const {
 	request_fp_OTP,
 	getUserProfile,
 	deleteUser,
+	forgotPassword,
 	cancelDeleteUser
 } = require('../controllers/AuthControllers.js')
 
@@ -26,11 +27,11 @@ authRouter.post('/register', registerUser);
 authRouter.post('/verification', emailVerification)
 authRouter.post('/signin', loginUser)
 authRouter.post('/signout', requireAuth, logoutUser)
-authRouter.post('/change_email', requireAuth, changeEmail)
-authRouter.post('/change_password', requireAuth, changePassword)
-authRouter.post('/request_user_delete', requireAuth, deleteUser)
-authRouter.post('/cancel_user_delete', cancelDeleteUser)
-
+authRouter.post('/change-email', requireAuth, changeEmail)
+authRouter.post('/change-password', requireAuth, changePassword)
+authRouter.post('/request-user-delete', requireAuth, deleteUser)
+authRouter.post('/cancel-user-delete', cancelDeleteUser)
+authRouter.post('/reset-password',forgotPassword)
 authRouter.post('/request-fp-token', tokenRequestLimiter, request_fp_OTP)
 authRouter.post('/request-ev-token', tokenRequestLimiter, request_ev_OTP)
 authRouter.post('/request-ce-token', tokenRequestLimiter, requireAuth, request_ce_OTP)

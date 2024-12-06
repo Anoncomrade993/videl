@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Profile - Videl</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+	<!-- Navigation -->
+	<nav class="fixed w-full z-20 top-0 left-0 border-b border-gray-200 bg-white/90 backdrop-blur-md">
+		<div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+			<a href="#" class="flex items-center space-x-3">
+				<span class="self-center text-2xl font-semibold whitespace-nowrap text-orange-600">Videl</span>
+			</a>
+		</div>
+	</nav>
+
+	<!-- Profile Section -->
+	<div class="pt-24 container mx-auto px-4">
+		<div class="max-w-md mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+			<!-- Profile Header -->
+			<div class="p-6 bg-gradient-to-br from-orange-50 to-orange-100 flex flex-col items-center">
+				<div class="relative">
+					<img src="/api/placeholder/150/150" alt="Profile Avatar" class="w-24 h-24 rounded-full border-4 border-white shadow-lg object-cover" />
+					<button class="absolute bottom-0 right-0 bg-orange-600 text-white rounded-full p-2 shadow-lg hover:bg-orange-700">
+						<i data-lucide="camera" class="w-4 h-4"></i>
+					</button>
+				</div>
+				<h2 class="mt-4 text-2xl font-bold text-gray-800">John Doe</h2>
+				<p class="text-gray-600">@johndoe</p>
+			</div>
+
+			<!-- Profile Menu -->
+			<div class="p-4">
+				<!-- Account Settings -->
+				<div class="mb-6">
+					<h3 class="text-lg font-semibold text-gray-800 mb-4">Account</h3>
+					<div class="space-y-2">
+						<a href="#" class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="user" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Edit Profile</span>
+							<i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+						</a>
+						<a href="#" class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="lock" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Change Password</span>
+							<i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+						</a>
+					</div>
+				</div>
+
+				<!-- Preferences -->
+				<div class="mb-6">
+					<h3 class="text-lg font-semibold text-gray-800 mb-4">Preferences</h3>
+					<div class="space-y-2">
+						<a href="#" class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="settings" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Settings</span>
+							<i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+						</a>
+						<a href="#" class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="bell" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Notifications</span>
+							<i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+						</a>
+						<div class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="moon" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Dark Mode</span>
+							<label class="switch">
+								<input type="checkbox" class="hidden">
+								<span class="slider round"></span>
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<!-- Privacy & Legal -->
+				<div class="mb-6">
+					<h3 class="text-lg font-semibold text-gray-800 mb-4">Privacy & Legal</h3>
+					<div class="space-y-2">
+						<a href="#" class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="shield" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Privacy Policy</span>
+							<i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+						</a>
+						<a href="#" class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="file-text" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Terms of Service</span>
+							<i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+						</a>
+					</div>
+				</div>
+
+				<!-- Support -->
+				<div class="mb-6">
+					<h3 class="text-lg font-semibold text-gray-800 mb-4">Support</h3>
+					<div class="space-y-2">
+						<a href="#" class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="help-circle" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Help Center</span>
+							<i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+						</a>
+						<a href="#" class="flex items-center p-3 hover:bg-gray-100 rounded-lg transition-colors">
+							<i data-lucide="message-circle" class="w-5 h-5 mr-3 text-gray-500"></i>
+							<span class="flex-grow">Contact Support</span>
+							<i data-lucide="chevron-right" class="w-5 h-5 text-gray-400"></i>
+						</a>
+					</div>
+				</div>
+
+				<!-- Logout -->
+				<div class="mt-8">
+					<button class="w-full flex justify-center items-center py-3 px-4 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+						<i data-lucide="log-out" class="w-5 h-5 mr-3"></i>
+						Logout
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<style>
+		/* Dark mode toggle switch */
+		.switch {
+			position: relative;
+			display: inline-block;
+			width: 40px;
+			height: 20px;
+		}
+
+		.switch .slider {
+			position: absolute;
+			cursor: pointer;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background-color: #ccc;
+			transition: .4s;
+			border-radius: 34px;
+		}
+
+		.switch .slider:before {
+			position: absolute;
+			content: "";
+			height: 16px;
+			width: 16px;
+			left: 2px;
+			bottom: 2px;
+			background-color: white;
+			transition: .4s;
+			border-radius: 50%;
+		}
+
+		.switch input:checked+.slider {
+			background-color: #4CAF50;
+		}
+
+		.switch input:checked+.slider:before {
+			transform: translateX(20px);
+		}
+	</style>
+
+	<script>
+		// Initialize Lucide icons
+		lucide.createIcons();
+
+		// Dark mode toggle
+		const darkModeToggle = document.querySelector('.switch input');
+		darkModeToggle.addEventListener('change', () => {
+			document.documentElement.classList.toggle('dark');
+		});
+	</script>
+</body>
+
+</html>

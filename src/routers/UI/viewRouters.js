@@ -18,12 +18,13 @@ uiRouter.get('/', (req, res) => {
             <html>
             <head>
             <meta http-equiv="refresh" content="3;url=/dashboard">
-            <title>Redirecting...</title></head>
+            <title>...</title></head>
             <body></body>
   </html> `);
 	}
 	renderView('landing')(req, res);
 });
+
 
 uiRouter.get('/dashboard', requireAuthUI, renderView('dashboard'));
 uiRouter.get('/change-password', requireAuthUI, renderView('change-password'));
