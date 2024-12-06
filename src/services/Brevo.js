@@ -53,10 +53,6 @@ async function sendEmail(recipientEmail, subject, template, data = {}) {
  * @typedef {(recipientEmail: string, data: EmailData) :> Promise<boolean>} EmailSendFunction
  */
 
-/**
- * @type {Object.<string, EmailSendFunction>}
- */
-const { sendEmail, verifyEmail, forgotPassword, changeEmail, changePassword } = require('./emailTemplates'); // Adjust the import based on your structure
 
 module.exports = {
 	sendVerifyEmail: async (recipientEmail, data) => {
