@@ -5,7 +5,7 @@
  */
 
 
-module.exports.requireAuthUI = async function(req, res, next) {
+async function requireAuthUI(req, res, next) {
 	try {
 		const user = req.session?.user;
 
@@ -61,4 +61,12 @@ function handleErrorView(err, req, res) {
 			error: process.env.NODE_ENV !== 'production' ? err : null
 		}
 	});
+}
+
+
+module.exports = {
+	requireAuthUI,
+	handleErrorView,
+	renderView,
+	
 }

@@ -1,5 +1,6 @@
 const express = require('express');
-const { requireAuthUI, renderView, handleErrorView } = require('./utils.js');
+const { requireAuthUI, renderView, handleErrorView } = require('../middlewares/ui.js');
+
 
 const uiRouter = express.Router();
 
