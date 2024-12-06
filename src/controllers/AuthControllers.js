@@ -32,7 +32,7 @@ module.exports.registerUser = async function(req, res) {
 		if (exists) {
 			return sendJsonResponse(res, 400, false, 'Email in use')
 		}
-		avatar = generateAvatar(username);
+		avatar = await generateAvatar(username);
 
 		// Create user
 		const { success, message, user } = await User.createUser({ email, password, username, avatar })
@@ -354,7 +354,7 @@ module.exports.request_ev_OTP = async function(req, res) {
 		if (!isUser) {
 			return sendJsonResponse(res, 404, false, 'User not found')
 		}
-		const { success, message: _, plain } = await Token.generateToken({ email, purpose: 'VerifyEmail' });
+		const { success, message: _, plain } = await Token.generateToken({ email, purpose: 'verifyEmail' });
 		if (!success) {
 			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
 		}

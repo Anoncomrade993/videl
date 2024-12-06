@@ -1,7 +1,7 @@
 const express = require('express');
 const { requireAuthUI, renderView, handleErrorView } = require('../middlewares/ui.js');
 
-
+//
 const uiRouter = express.Router();
 
 uiRouter.get('/welcome', renderView('landing'));

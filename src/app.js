@@ -20,7 +20,7 @@
 
  const AuthRouter = require("../src/routers/AuthRouters.js");
  const LinkRouter = require("../src/routers/LinkRouters.js");
- const ViewRouter = require("../src/routers/UI/ViewRouters.js")
+ const ViewRouter = require("../src/routers/ViewRouters.js")
 
  const MainRouter = express.Router();
  const app = express();
