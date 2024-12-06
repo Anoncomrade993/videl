@@ -2,8 +2,6 @@
 //might fancy another idea later 
 
 const mongoose = require('mongoose');
-const
-
 
 const scheduleSchema = new mongoose.Schema({
 	user: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
@@ -53,4 +51,4 @@ scheduleSchema.statics.cancelSchedule = async function(user) {
 		return { success: true };
 	}
 }
-module.exports = mongoose.model('Schedule', schedule)
+module.exports = mongoose.model('Schedule', scheduleSchema)

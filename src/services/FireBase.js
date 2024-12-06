@@ -1,9 +1,5 @@
-/**
- * @Author : MockingBugs
- **/
-
 require('dotenv').config()
-const fileType = require('file-type');
+const mime = require('mime-types');
 const admin = require('firebase-admin');
 
 const UPLOAD_STORAGE = process.env.UPLOAD_STORAGE;
@@ -17,12 +13,11 @@ admin.initializeApp({
 
 const bucket = admin.storage().bucket();
 
-
-
 async function uploadCaptureFile(req_file, buffer, customMetadata = {}, filename) {
-	// Determine the content type from the buffer
-	const detectedType = await fileType.fromBuffer(buffer);
-	const contentType = detectedType ? detectedType.mime : req_file.mimetype || 'application/octet-stream';
+	// Determine the content type using mime-types
+	const contentType = mime.lookup(filename) || 
+		req_file.mimetype || 
+		'application/octet-stream';
 
 	const metadata = {
 		contentType: contentType,
@@ -56,14 +51,6 @@ async function uploadCaptureFile(req_file, buffer, customMetadata = {}, filename
 	}
 }
 
-
-/**
- * 
- * @param {String} captureId
- * @returns {{file, metadata}} 
- * 
- */
-
 async function findFileById(captureId) {
 	const [files] = await bucket.getFiles({ prefix: UPLOAD_STORAGE });
 
@@ -77,12 +64,6 @@ async function findFileById(captureId) {
 	return null;
 }
 
-/**
- * 
- * @param {String} userId
- * @returns {Array<{file, metadata}>}
- * 
- */
 async function findFilesByUserId(userId) {
 	const [files] = await bucket.getFiles({ prefix: UPLOAD_STORAGE });
 	const userFiles = [];
@@ -97,14 +78,6 @@ async function findFilesByUserId(userId) {
 	return userFiles;
 }
 
-
-
-/**
- * 
- * @param {String} userId
- * @returns {{Number,String}}
- * 
- */
 async function deleteAllFilesByUserId(userId) {
 	try {
 		const userFiles = await findFilesByUserId(userId);
@@ -127,10 +100,24 @@ async function deleteAllFilesByUserId(userId) {
 	}
 }
 
+async function downloadBuffer(captureId) {
+	try {
+		const fileData = await findFileById(captureId);
+		if (!fileData) {
+			return { success: false, buffer: null };
+		}
+		const [buffer] = await fileData.file.download();
+		return { success: true, buffer };
+	} catch (error) {
+		console.error('Error fetching file:', error);
+		return { success: false, buffer: null };
+	}
+}
 
 module.exports = {
 	uploadCaptureFile,
-	findFileByCaptureId,
+	findFileById,
 	deleteAllFilesByUserId,
-	findFilesByUserId
+	findFilesByUserId,
+	downloadBuffer
 };

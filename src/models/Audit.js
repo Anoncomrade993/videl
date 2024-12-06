@@ -29,7 +29,7 @@ const apiAuditSchema = new mongoose.Schema({
 		required: true,
 	},
 	details: {
-		type: Schema.Types.Mixed,
+		type: mongoose.Schema.Types.Mixed,
 		default: {},
 	},
 }, {

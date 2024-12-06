@@ -99,7 +99,7 @@ const captureSchema = new mongoose.Schema({
 	computedHash: String,
 	confidence: Number,
 	mediaUrl: { type: String, immutable: true },
-	hasMedia: { Boolean, default: false }
+	hasMedia: { type:Boolean, default: false }
 }, {
 	timestamps: true
 });
