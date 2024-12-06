@@ -36,7 +36,7 @@ userSchema.statics.createUser = async function(data = {}) {
 	try {
 		if (!data || Object.keys(data).length === 0) return { success: false, message: 'Missing data', user: null }
 		data.password = await Scrypt.hashToken(data.password);
-		const user = await this.create(...data);
+		const user = await this.create({...data});
 		if (!user) return { success: false, message: 'Error creating user', user: null }
 		return { success: true, message: 'created successfully', user }
 	} catch (databaseError) {
