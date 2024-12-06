@@ -430,9 +430,9 @@ module.exports.deleteUser = async function(req, res) {
 		}
 
 		const tweeks = new Date(Date.now() + (14 * 24 * 3600 * 1000))
-		const { success, status, message } = await Schedule.createSchedule(isUser._id);
-		if (!success) {
-			return sendJsonResponse(res, status, success, message)
+		const { success: done, status, message } = await Schedule.createSchedule(isUser._id);
+		if (!done) {
+			return sendJsonResponse(res, status, done, message)
 		}
 
 		isUser.onKillList = true;
