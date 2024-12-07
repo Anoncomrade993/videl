@@ -10,7 +10,7 @@ const {
 	sendChangePasswordEmail,
 	sendForgotPasswordEmail,
 	sendDeleteUserEmail
-} = require('../services/Brevo.js');
+} = require('../services/Gmail.js');
 
 const { saveSession, destroySession } = require('../middlewares/session.js')
 const generateAvatar = require('../identicons/generator.js')
@@ -32,7 +32,7 @@ module.exports.registerUser = async function(req, res) {
 		if (exists) {
 			return sendJsonResponse(res, 400, false, 'Email in use')
 		}
-		avatar = await generateAvatar(username);
+		avatar = generateAvatar(username);
 
 		// Create user
 		const { success, message, user } = await User.createUser({ email, password, username, avatar })
