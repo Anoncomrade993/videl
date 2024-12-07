@@ -1,58 +1,48 @@
 const { config } = require('dotenv');
-const SibApiV3Sdk = require('sib-api-v3-sdk');
+const { MailtrapClient } = require('mailtrap');
 const { deletUser, verifyEmail, changeEmail, forgotPassword, changePassword } = require('../shared/templates.js');
 
-
-// Initialize the API client
-const defaultClient = SibApiV3Sdk.ApiClient.instance;
-const apiKey = defaultClient.authentications['api-key'];
+// Load environment variables
 config();
 
-apiKey.apiKey = process.env.BREVO_API_KEY;
-
-const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+// Initialize the Mailtrap client
+const client = new MailtrapClient({ token: process.env.MAILTRAP_API_TOKEN });
 
 /**
  * Base function to send email
  * @param {string} recipientEmail - Recipient's email address
  * @param {string} subject - Email subject
- * @param {string} htmlContent - HTML content of the email
+ * @param {Function} template - Email template function
+ * @param {Object} data - Data to be passed to the template
  * @returns {Promise<boolean>}
  */
 async function sendEmail(recipientEmail, subject, template, data = {}) {
-	const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
-
+	// Populate additional data
 	data.twitter = process.env.TWITTER;
-	data.telegram = process.env.TELEGRAM
+	data.telegram = process.env.TELEGRAM;
 	data.contact = process.env.CONTACT;
 	data.privacy = process.env.PRIVACY;
 
-
 	const htmlContent = template(data);
 
-	sendSmtpEmail.subject = subject;
-	sendSmtpEmail.htmlContent = htmlContent;
-	sendSmtpEmail.sender = {
-		name: process.env.BREVO_APP_NAME,
-		email: process.env.BREVO_SENDER_EMAIL
+	const sender = {
+		name: process.env.APP_NAME,
+		email: process.env.SENDER_EMAIL
 	};
 
-	sendSmtpEmail.to = [{ email: recipientEmail }];
-
 	try {
-		await apiInstance.sendTransacEmail(sendSmtpEmail);
+		await client.send({
+			from: sender,
+			to: [{ email: recipientEmail }],
+			subject: subject,
+			html: htmlContent
+		});
 		return true;
 	} catch (error) {
 		console.error("Error sending email:", error);
 		throw error;
 	}
 }
-
-/**
- * @typedef {Object} EmailData
- * @typedef {(recipientEmail: string, data: EmailData) :> Promise<boolean>} EmailSendFunction
- */
-
 
 module.exports = {
 	sendVerifyEmail: async (recipientEmail, data) => {

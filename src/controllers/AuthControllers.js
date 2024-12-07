@@ -10,7 +10,7 @@ const {
 	sendChangePasswordEmail,
 	sendForgotPasswordEmail,
 	sendDeleteUserEmail
-} = require('../services/Gmail.js');
+} = require('../services/MailTrap.js');
 
 const { saveSession, destroySession } = require('../middlewares/session.js')
 const generateAvatar = require('../identicons/generator.js')
