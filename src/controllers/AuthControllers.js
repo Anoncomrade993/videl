@@ -10,7 +10,7 @@ const {
 	sendChangePasswordEmail,
 	sendForgotPasswordEmail,
 	sendDeleteUserEmail
-} = require('../services/MailTrap.js');
+} = require('../services/NMailer.js');
 
 const { saveSession, destroySession } = require('../middlewares/session.js')
 const generateAvatar = require('../identicons/generator.js')
