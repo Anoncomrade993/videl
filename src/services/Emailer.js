@@ -3,6 +3,9 @@ const nodemailer = require('nodemailer');
 const { deletUser, verifyEmail, changeEmail, forgotPassword, changePassword } = require('../shared/templates.js');
 
 
+
+
+
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
 	auth: {
@@ -23,10 +26,7 @@ async function sendEmail(recipientEmail, subject, template, data = {}) {
 	const htmlContent = template(data);
 
 	const mailOptions = {
-		from: {
-			name: process.env.APP_NAME,
-			address: process.env.SENDER_EMAIL
-		},
+		from: process.env.SENDER_EMAIL,
 		to: recipientEmail,
 		subject: subject,
 		html: htmlContent
