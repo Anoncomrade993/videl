@@ -1,7 +1,8 @@
+require('dotenv').config();
 const nodemailer = require('nodemailer');
-const { getAuth } = require('firebase-admin/auth');
+const { deletUser, verifyEmail, changeEmail, forgotPassword, changePassword } = require('../shared/templates.js');
 
-// Create transporter (adjust based on your email service)
+
 const transporter = nodemailer.createTransport({
 	service: 'gmail',
 	auth: {
@@ -10,14 +11,8 @@ const transporter = nodemailer.createTransport({
 	}
 });
 
-/**
- * Base function to send email
- * @param {string} recipientEmail - Recipient's email address
- * @param {string} subject - Email subject
- * @param {Function} template - Email template function
- * @param {Object} data - Data to be passed to the template
- * @returns {Promise<boolean>}
- */
+
+
 async function sendEmail(recipientEmail, subject, template, data = {}) {
 	// Populate additional data
 	data.twitter = process.env.TWITTER;
@@ -38,8 +33,6 @@ async function sendEmail(recipientEmail, subject, template, data = {}) {
 	};
 
 	try {
-
-		// Send email
 		await transporter.sendMail(mailOptions);
 		return true;
 	} catch (error) {
