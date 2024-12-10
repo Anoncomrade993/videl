@@ -2,16 +2,32 @@ import Dialog from './Dialog'
 
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.querySelector('form');
-	const passwordInput = document.querySelector('input[name="password"]');
-	const confirmPasswordInput = document.querySelector('input[name="cpassword"]');
-	const emailInput = document.querySelector('input[name="email"]');
-	const usernameInput = document.querySelector('input[name="username"]');
 
-	form.addEventListener('submit', async function(event) {
+	// Remove any existing submit event listeners
+	const oldForm = form.cloneNode(true);
+	form.parentNode.replaceChild(oldForm, form);
+
+	oldForm.addEventListener('submit', async function(event) {
+		// Multiple layers of prevention
 		event.preventDefault();
+		event.stopPropagation();
+		event.stopImmediatePropagation();
+
+		// Disable submit button to prevent multiple submissions
+		const submitButton = this.querySelector('button[type="submit"]');
+		if (submitButton) {
+			submitButton.disabled = true;
+			submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+		}
 
 		// Clear any previous error messages
 		clearErrors();
+
+		// Get input elements
+		const passwordInput = this.querySelector('input[name="password"]');
+		const confirmPasswordInput = this.querySelector('input[name="cpassword"]');
+		const emailInput = this.querySelector('input[name="email"]');
+		const usernameInput = this.querySelector('input[name="username"]');
 
 		// Validation checks
 		const validations = [
@@ -27,7 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		// Check if passwords match
 		if (passwordInput.value.trim() !== confirmPasswordInput.value.trim()) {
-			errors.push({ errorMessage: 'Passwords must match' });
+			errors.push({ input: confirmPasswordInput, errorMessage: 'Passwords must match' });
 		}
 
 		// If there are validation errors, display them and stop submission
@@ -39,11 +55,18 @@ document.addEventListener('DOMContentLoaded', () => {
 				type: 'error'
 			});
 
-			// Also highlight specific inputs
+			// Highlight specific inputs
 			errors.forEach(({ input, errorMessage }) => {
 				displayError(input, errorMessage);
 			});
-			return;
+
+			// Re-enable submit button
+			if (submitButton) {
+				submitButton.disabled = false;
+				submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+			}
+
+			return false;
 		}
 
 		try {
@@ -75,22 +98,15 @@ document.addEventListener('DOMContentLoaded', () => {
 					message: 'Your account has been created!',
 					type: 'success',
 					onConfirm: () => {
-						form.reset();
-						window.localStorage.setItem('uemail', JSON.stringify(userData.email))
-						window.location.href = '/verification'
+						this.reset();
+						window.localStorage.setItem('uemail', JSON.stringify(userData.email));
+						window.location.href = '/verification';
 					}
 				});
 			} else {
 				// Server returned an error
-
 				throw new Error(result.message || 'Registration failed');
-				Dialog.show({
-					title: 'Registration Error',
-					message: result.message || 'Registration failed',
-					type: response.status > 399 && response.status < 500 ? 'warning' : 'error'
-				})
 			}
-
 		} catch (error) {
 			// Display user-friendly error dialog
 			Dialog.show({
@@ -98,8 +114,17 @@ document.addEventListener('DOMContentLoaded', () => {
 				message: error.message || 'An unexpected error occurred',
 				type: 'error'
 			});
+		} finally {
+			// Re-enable submit button
+			if (submitButton) {
+				submitButton.disabled = false;
+				submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+			}
 		}
-	});
+
+		// Explicitly return false to prevent any default submission
+		return false;
+	}, { passive: false });
 
 	// Validation helper functions
 	function validateEmail(email) {
@@ -117,20 +142,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Error display functions
 	function displayError(input, message) {
-		// Create or update error element
 		let errorElement = input.nextElementSibling;
 		if (!errorElement || !errorElement.classList.contains('error-message')) {
 			errorElement = document.createElement('div');
-			errorElement.classList.add('error-message');
+			errorElement.classList.add('error-message', 'text-red-500', 'text-xs', 'mt-1');
 			input.parentNode.insertBefore(errorElement, input.nextSibling);
 		}
 
 		errorElement.textContent = message;
-		input.classList.add('error');
+		input.classList.add('border-red-500');
 	}
 
 	function clearErrors() {
 		document.querySelectorAll('.error-message').forEach(el => el.remove());
-		document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+		document.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500'));
 	}
 });
