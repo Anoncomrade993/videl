@@ -57,7 +57,11 @@
  app.engine('html', ejs.renderFile)
  app.set('view engine', 'ejs');
  app.set('views', path.join(__dirname, 'views'));
+ // Static File Serving
  app.use(express.static(path.join(__dirname, 'public')))
+ app.use(express.static(path.join(__dirname, 'public', 'client')));
+
+
  // Security Middleware
  app.use(helmet({
  	contentSecurityPolicy: {
@@ -85,8 +89,6 @@
  app.use(attackMiddleware);
  app.disable("x-powered-by");
 
- // Static File Serving
- app.use(express.static(path.join(__dirname, 'public')));
 
 
  // Session Setup 
