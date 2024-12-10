@@ -96,7 +96,6 @@
 		</div>
 	</div>
 
-	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<script type="module">
 		import Dialog from '../utils/Dialog.js';
 
@@ -105,7 +104,7 @@
 			const submitBtn = document.getElementById('submit');
 
 			form.addEventListener('submit', async (event) => {
-				event.preventDefault();
+				event.preventDefault(); // Prevent default form submission
 				clearErrors();
 
 				const username = form.username.value.trim();
@@ -192,6 +191,10 @@
 				document.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500'));
 			}
 		});
+	</script>
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+	<script>
+		lucide.createIcons();
 	</script>
 </body>
 
