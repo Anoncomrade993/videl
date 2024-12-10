@@ -5,7 +5,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<title>Login - Videl</title>
-	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="/styles.css">
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<style>
 		@media screen and (-webkit-min-device-pixel-ratio:0) {
@@ -103,10 +103,10 @@
 					</div>
 
 					<div class="mt-4 sm:mt-6 grid grid-cols-1 gap-3">
-						<button onclick="handleGitHubLogin()" class="w-full flex items-center justify-center gap-3 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 active:scale-[0.98] transition-transform">
+						<a href="/auth/gh/initialize" class="w-full flex items-center justify-center gap-3 py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50 active:scale-[0.98] transition-transform">
 							<i data-lucide="github" class="w-4 h-4 sm:w-5 sm:h-5"></i>
 							<span>Continue with GitHub</span>
-						</button>
+						</a>
 					</div>
 				</div>
 			</div>
@@ -115,12 +115,7 @@
 
 	<script src="/signin.js"></script>
 	<script>
-		// Initialize Lucide icons
 		lucide.createIcons();
-		// Handle GitHub login
-		function handleGitHubLogin() {
-			window.location.href = '/auth/gh/initialize';
-		}
 	</script>
 </body>
 
