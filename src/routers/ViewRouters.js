@@ -6,7 +6,7 @@ const uiRouter = express.Router();
 
 uiRouter.get('/welcome', renderView('Landing.html'));
 uiRouter.get('/register', renderView('register.html'));
-uiRouter.get('/signin', renderView('signin.html'));
+uiRouter.get('/signin', renderView('login.html'));
 uiRouter.get('/forgotten-password', renderView('forgotten.html'));
 
 uiRouter.get('/terms', renderView('terms.html'));
