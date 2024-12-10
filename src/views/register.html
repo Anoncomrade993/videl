@@ -138,6 +138,7 @@
 						type: 'success',
 						onConfirm: () => {
 							form.reset();
+							window.localStorage.setItem('uemail', JSON.stringify({ email }));
 							window.location.href = '/verification';
 						}
 					});
