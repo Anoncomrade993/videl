@@ -25,7 +25,6 @@ const apiAuditSchema = new mongoose.Schema({
 	},
 	status: {
 		type: String,
-		enum: ['success', 'failure'],
 		required: true,
 	},
 	details: {
