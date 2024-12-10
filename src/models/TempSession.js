@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 
 const sessionSchema = new mongoose.Schema({
-	state: { type: String, required: true, unique: trye, immutable: true },
+	state: { type: String, required: true, unique: true, immutable: true },
 }, { timestamps: true });
 
 sessionSchema.index({ state: 1 })
