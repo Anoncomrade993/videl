@@ -1,7 +1,13 @@
-import Dialog from './Dialog'
+import Dialog from '../utils/Dialog.js'
 
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.querySelector('form');
+
+	// Prevent default form submission immediately
+	form.addEventListener('submit', function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+	}, { passive: false });
 
 	// Remove any existing submit event listeners
 	const oldForm = form.cloneNode(true);
