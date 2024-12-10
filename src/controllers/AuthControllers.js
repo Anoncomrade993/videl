@@ -20,7 +20,7 @@ const axios = require('axios')
 
 module.exports.registerUser = async function(req, res) {
 	try {
-		const { email, username, password } = req.body
+		const { email, username, password, cpassword } = req.body
 		let avatar = null;
 		// Validate input
 		if (!email.trim() || !username.trim() || !password.trim()) {
