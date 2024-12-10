@@ -9,11 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		event.stopPropagation();
 	}, { passive: false });
 
-	// Remove any existing submit event listeners
-	const oldForm = form.cloneNode(true);
-	form.parentNode.replaceChild(oldForm, form);
-
-	oldForm.addEventListener('submit', async function(event) {
+	const subBtn = document.getElementById('submit')
+	subBtn.addEventListener('submit', async function(event) {
 		// Multiple layers of prevention
 		event.preventDefault();
 		event.stopPropagation();
