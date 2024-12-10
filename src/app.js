@@ -58,22 +58,24 @@
  app.set('view engine', 'ejs');
  app.set('views', path.join(__dirname, 'views'));
  // Static File Serving
+
  app.use(express.static(path.join(__dirname, 'public')))
  app.use(express.static(path.join(__dirname, 'public', 'client')));
+ app.use(express.static(path.join(__dirname, 'public', 'assets')));
 
 
  // Security Middleware
  app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
-    },
-  },
-  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
-}));
+ 	contentSecurityPolicy: {
+ 		directives: {
+ 			defaultSrc: ["'self'"],
+ 			scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+ 			styleSrc: ["'self'", "'unsafe-inline'"],
+ 			imgSrc: ["'self'", "data:", "https:"],
+ 		},
+ 	},
+ 	referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+ }));
 
 
  // Middleware Setup

@@ -1,17 +1,7 @@
 const express = require('express');
 const { requireAuthUI, renderView, handleErrorView } = require('../middlewares/ui.js');
 const { logAuditAction } = require('../middlewares/audit.js')
-
-
 const uiRouter = express.Router();
-
-uiRouter.get('/welcome', renderView('Landing.html'));
-uiRouter.get('/register', renderView('register.html'));
-uiRouter.get('/signin', renderView('login.html'));
-uiRouter.get('/forgotten-password', renderView('forgotten.html'));
-
-uiRouter.get('/terms', renderView('terms.html'));
-uiRouter.get('/policy', renderView('policy.html'));
 
 uiRouter.get('/', (req, res) => {
 	if (req.session?.user) {
@@ -28,9 +18,33 @@ uiRouter.get('/', (req, res) => {
 });
 
 
-uiRouter.get('/dashboard', requireAuthUI, renderView('dashboard.html'));
+
+uiRouter.get('/welcome', renderView('Landing.html'));
+uiRouter.get('/register', renderView('register.html'));
+uiRouter.get('/signin', renderView('login.html'));
+uiRouter.get('/forgotten-password', renderView('forgotten.html'));
+
+uiRouter.get('/terms', renderView('terms.html'));
+uiRouter.get('/policy', renderView('policy.html'));
+
+uiRouter.get('/dashboard', requireAuthUI, async function(req, res) {
+	try {
+		const user = req.session?.user;
+
+		if (!user || !user.isVerified) {
+			return res.render('401.html')
+		}
+		const { username, avatar, isAuthWithGitSigned = false } = user
+		return res.render('dashboard.html', { username, avatar, isAuthWithGithub })
+	} catch (error) {
+		console.error('Error rendering dashboard', error)
+		return res.render('500.html')
+	}
+});
+
 uiRouter.get('/change-password', requireAuthUI, renderView('change-password.html'));
 uiRouter.get('/verification', requireAuthUI, renderView('verification.html'));
+
 /*
 uiRouter.get('/cancel-delete-schedule', renderView('cancel-delete-schedule.html'));
 uiRouter.get('/l/:linkId', renderView('link-detail.html'));

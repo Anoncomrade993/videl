@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			};
 
 			// Send registration request
-			const response = await fetch('/api/v1/auth/signin', {
+			const response = await fetch('/auth/signin', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
