@@ -1,7 +1,8 @@
 const express = require('express');
 const { requireAuthUI, renderView, handleErrorView } = require('../middlewares/ui.js');
+const { logAuditAction } = require('../middlewares/audit.js')
 
-//
+
 const uiRouter = express.Router();
 
 uiRouter.get('/welcome', renderView('Landing.html'));
