@@ -26,75 +26,56 @@
 	<!-- Registration Section -->
 	<div class="pt-16 sm:pt-24 bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
 		<div class="max-w-md w-full mx-auto bg-white rounded-xl shadow-2xl overflow-hidden p-6 sm:p-8">
-			<h2 class="text-2xl sm:text-3xl font-extrabold text-center text-gray-900 mb-4 sm:mb-6">
-				Create Your Account
-			</h2>
-			<form class="space-y-4 sm:space-y-6">
+			<h2 class="text-2xl sm:text-3xl font-extrabold text-center text-gray-900 mb-4 sm:mb-6">Create Your Account</h2>
+			<form class="space-y-4 sm:space-y-6" id="registration-form">
 				<div>
-					<label for="username" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-						Username
-					</label>
+					<label for="username" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Username</label>
 					<div class="relative">
 						<div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
 							<i data-lucide="user" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"></i>
 						</div>
-						<input name="username" type="text" id="username" required class="pl-8 sm:pl-10 block w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg shadow-sm 
-                            focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Choose a username">
+						<input name="username" type="text" id="username" required class="pl-8 sm:pl-10 block w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Choose a username">
 					</div>
 				</div>
 
 				<div>
-					<label for="email" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-						Email Address
-					</label>
+					<label for="email" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Email Address</label>
 					<div class="relative">
 						<div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
 							<i data-lucide="mail" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"></i>
 						</div>
-						<input name="email" type="email" id="email" required class="pl-8 sm:pl-10 block w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg shadow-sm 
-                            focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="you@example.com">
+						<input name="email" type="email" id="email" required class="pl-8 sm:pl-10 block w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="you@example.com">
 					</div>
 				</div>
 
 				<div>
-					<label for="password" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-						Password
-					</label>
+					<label for="password" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Password</label>
 					<div class="relative">
 						<div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
 							<i data-lucide="lock" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"></i>
 						</div>
-						<input name="password" type="password" id="password" required class="pl-8 sm:pl-10 block w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg shadow-sm 
-                            focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Create a strong password">
+						<input name="password" type="password" id="password" required class="pl-8 sm:pl-10 block w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Create a strong password">
 					</div>
 				</div>
 
 				<div>
-					<label for="confirm-password" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-						Confirm Password
-					</label>
+					<label for="confirm-password" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Confirm Password</label>
 					<div class="relative">
 						<div class="absolute inset-y-0 left-0 pl-2 sm:pl-3 flex items-center pointer-events-none">
 							<i data-lucide="check-circle" class="w-4 h-4 sm:w-5 sm:h-5 text-gray-400"></i>
 						</div>
-						<input name="cpassword" type="password" id="confirm-password" required class="pl-8 sm:pl-10 block w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg shadow-sm 
-                            focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Repeat your password">
+						<input name="cpassword" type="password" id="confirm-password" required class="pl-8 sm:pl-10 block w-full px-2 py-1 sm:px-3 sm:py-2 text-xs sm:text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Repeat your password">
 					</div>
 				</div>
 
 				<div>
-					<button id="submit" type="button" class="w-full flex justify-center py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-base border border-transparent rounded-lg shadow-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
+					<button id="submit" type="submit" class="w-full flex justify-center py-2 sm:py-3 px-3 sm:px-4 text-xs sm:text-base border border-transparent rounded-lg shadow-sm font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
 						Sign up
 					</button>
 				</div>
 
 				<div class="text-center">
-					<p class="mt-2 text-xs sm:text-sm text-gray-600">
-						Already have an account?
-						<a href="/auth/signin" class="font-medium text-orange-600 hover:text-orange-500">
-							Log in
-						</a>
-					</p>
+					<p class="mt-2 text-xs sm:text-sm text-gray-600">Already have an account? <a href="/auth/signin" class="font-medium text-orange-600 hover:text-orange-500">Log in</a></p>
 				</div>
 			</form>
 
@@ -104,24 +85,113 @@
 						<div class="w-full border-t border-gray-300"></div>
 					</div>
 					<div class="relative flex justify-center text-xs sm:text-sm">
-						<span class="px-2 bg-white text-gray-500">
-							Or continue with
-						</span>
+						<span class="px-2 bg-white text-gray-500">Or continue with</span>
 					</div>
 				</div>
 
 				<div class="mt-4 sm:mt-6 grid grid-cols-1 gap-3">
-					<a href="#" class="w-full flex items-center justify-center py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50">
-						<i data-lucide="github" class="w-4 h-4 sm:w-5 sm:h-5"></i>
-					</a>
+					<a href="#" class="w-full flex items-center justify-center py-2 sm:py-3 border border-gray-300 rounded-lg hover:bg-gray-50"><i data-lucide="github" class="w-4 h-4 sm:w-5 sm:h-5"></i></a>
 				</div>
 			</div>
 		</div>
 	</div>
 
-
-	<script src="/client/registration.js"></script>
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+	<script type="module">
+		import Dialog from '../utils/Dialog.js';
+
+		document.addEventListener('DOMContentLoaded', () => {
+			const form = document.getElementById('registration-form');
+			const submitBtn = document.getElementById('submit');
+
+			form.addEventListener('submit', async (event) => {
+				event.preventDefault();
+				clearErrors();
+
+				const username = form.username.value.trim();
+				const email = form.email.value.trim();
+				const password = form.password.value.trim();
+				const confirmPassword = form.cpassword.value.trim();
+
+				const errors = validateForm(username, email, password, confirmPassword);
+				if (errors.length > 0) {
+					errors.forEach(error => displayError(error.input, error.message));
+					return;
+				}
+
+				submitBtn.disabled = true;
+				submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+				try {
+					const response = await fetch('/auth/register', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ username, email, password }),
+					});
+
+					const result = await response.json();
+					if (!response.ok) throw new Error(result.message || 'Registration failed');
+
+					Dialog.show({
+						title: 'Registration Successful',
+						message: 'Your account has been created!',
+						type: 'success',
+						onConfirm: () => {
+							form.reset();
+							window.location.href = '/verification';
+						}
+					});
+				} catch (error) {
+					Dialog.show({
+						title: 'Registration Error',
+						message: error.message || 'An unexpected error occurred',
+						type: 'error'
+					});
+				} finally {
+					submitBtn.disabled = false;
+					submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+				}
+			});
+
+			function validateForm(username, email, password, confirmPassword) {
+				const errors = [];
+				if (username.length < 3 || username.length > 20) {
+					errors.push({ input: form.username, message: 'Username must be 3-20 characters' });
+				}
+				if (!validateEmail(email)) {
+					errors.push({ input: form.email, message: 'Invalid email format' });
+				}
+				if (password.length < 8) {
+					errors.push({ input: form.password, message: 'Password must be at least 8 characters' });
+				}
+				if (password !== confirmPassword) {
+					errors.push({ input: form.cpassword, message: 'Passwords must match' });
+				}
+				return errors;
+			}
+
+			function validateEmail(email) {
+				const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+				return emailRegex.test(email);
+			}
+
+			function displayError(input, message) {
+				let errorElement = input.nextElementSibling;
+				if (!errorElement || !errorElement.classList.contains('error-message')) {
+					errorElement = document.createElement('div');
+					errorElement.classList.add('error-message', 'text-red-500', 'text-xs', 'mt-1');
+					input.parentNode.insertBefore(errorElement, input.nextSibling);
+				}
+				errorElement.textContent = message;
+				input.classList.add('border-red-500');
+			}
+
+			function clearErrors() {
+				document.querySelectorAll('.error-message').forEach(el => el.remove());
+				document.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500'));
+			}
+		});
+	</script>
 </body>
 
 </html>
