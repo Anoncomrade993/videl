@@ -6,7 +6,7 @@ const { generate } = require('../utility/helpers.js');
 
 const tokenSchema = new mongoose.Schema({
 	email: { type: String, required: true, immutable: true },
-	hashed: { type: String, required: true },
+	hashed: { type: String, required: true, unique: true, immutable: true },
 	purpose: {
 		type: String,
 		required: true,
@@ -38,9 +38,74 @@ tokenSchema.statics.generateToken = async function(data = {}) {
 };
 
 
+// as the name states 🥲
+// DO NOT TOUCH 
+tokenSchema.statics.verifyEmailVerificationToken = async function(token = ''.trim()) {
+	try {
+
+
+		if (!token) {
+			return {
+				status: 400,
+				success: false,
+				message: 'Verification token is required'
+			};
+		}
+
+
+		const isToken = await Token.findOne({
+			isUsed: false,
+			hashed: token,
+			purpose: 'VerifyEmail'
+		});
+
+
+		if (!isToken) {
+			return {
+				status: 404,
+				success: false,
+				message: 'Invalid or expired verification token'
+			};
+		}
+
+		// Find associated user
+		const user = await this.model('User').findOne({ email: isToken.email });
+		if (!user) {
+			return {
+				status: 404,
+				success: false,
+				message: 'User not found'
+			};
+		}
+
+		// Update token status
+		isToken.isUsed = true;
+		await isToken.save();
+
+		// Update user verification status
+		user.isVerified = true;
+		await user.save();
+
+		return {
+			status: 200,
+			success: true,
+			message: 'Email verified successfully',
+		};
+
+	} catch (error) {
+		return {
+			status: 500,
+			success: false,
+			message: 'Error verifying email',
+		};
+	}
+};
+
+
+
 
 //for API specifically 
-tokenSchema.statics.VerifyToken = async function(data = {}) {
+tokenSchema.statics.verifyToken = async function(data = {}) {
 	try {
 		const { email, token, purpose } = data;
 

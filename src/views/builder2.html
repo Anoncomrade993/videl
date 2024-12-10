@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>UI Builder - Videl</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+	<style>
+		#canvas {
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			position: relative;
+		}
+
+		#canvas::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(255, 255, 255, 0.7);
+			z-index: 1;
+		}
+
+		#canvas>* {
+			position: relative;
+			z-index: 2;
+			cursor: move;
+		}
+
+		.component-placeholder {
+			border: 2px dashed #orange-500;
+			padding: 10px;
+			margin: 10px 0;
+			background-color: rgba(255, 165, 0, 0.1);
+		}
+	</style>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex flex-col">
+	<nav class="bg-white shadow-sm p-4 flex justify-between items-center">
+		<div class="flex items-center space-x-3">
+			<span class="text-xl font-bold text-orange-600">UI Builder</span>
+		</div>
+		<div class="flex items-center space-x-3">
+			<button id="exportLayoutBtn" class="btn btn-primary flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600">
+				<i data-lucide="download" class="w-4 h-4"></i>
+				<span>Export Layout</span>
+			</button>
+		</div>
+	</nav>
+
+	<div class="flex flex-1">
+		<!-- Component Library -->
+		<div class="w-64 bg-white border-r p-4 space-y-4">
+			<h3 class="font-semibold text-gray-700 mb-4">Components</h3>
+			<div class="space-y-2">
+				<div draggable="true" data-type="header" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="heading" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Heading</span>
+				</div>
+				<div draggable="true" data-type="paragraph" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="type" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Paragraph</span>
+				</div>
+				<div draggable="true" data-type="section" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="layout-template" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Section</span>
+				</div>
+				<div draggable="true" data-type="text" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="text" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Text</span>
+				</div>
+				<div draggable="true" data-type="button" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="button" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Button</span>
+				</div>
+				<div draggable="true" data-type="image" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="image" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Image</span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Canvas -->
+		<div class="flex-1 p-8">
+			<div id="canvas" class="bg-white border-2 border-dashed border-gray-300 min-h-[600px] rounded-lg p-4">
+				<div class="text-center text-gray-400">
+					Drag components here
+				</div>
+			</div>
+		</div>
+
+		<!-- Properties Panel -->
+		<div class="w-64 bg-white border-l p-4 space-y-4">
+			<div>
+				<h3 class="font-semibold text-gray-700 mb-4">Background</h3>
+				<div class="bg-gray-100 p-3 rounded-lg">
+					<label class="block text-sm font-medium text-gray-700 mb-2">
+						Background Image
+					</label>
+					<input type="file" id="backgroundImageUpload" accept="image/*" class="block w-full text-sm text-gray-500 
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-orange-50 file:text-orange-700
+                        hover:file:bg-orange-100">
+					<div class="mt-2 flex items-center space-x-2">
+						<button id="removeBackgroundBtn" class="text-red-500 hover:text-red-700 flex items-center">
+							<i data-lucide="trash" class="w-4 h-4 mr-1"></i>Remove
+						</button>
+					</div>
+				</div>
+				<div class="mt-4 space-y-2">
+					<label class="block text-sm font-medium text-gray-700">Background Opacity</label>
+					<input type="range" id="backgroundOpacity" min="0" max="1" step="0.1" value="0.7" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+				</div>
+			</div>
+
+			<div id="component-properties" class="hidden">
+				<h3 class="font-semibold text-gray-700 mb-4">Component Properties</h3>
+				<div id="properties-content" class="space-y-3">
+					<!-- Dynamic properties will be inserted here -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Initialize Lucide icons
+		lucide.createIcons();
+
+		const canvas = document.getElementById('canvas');
+		const backgroundImageUpload = document.getElementById('backgroundImageUpload');
+		const removeBackgroundBtn = document.getElementById('removeBackgroundBtn');
+		const backgroundOpacity = document.getElementById('backgroundOpacity');
+		const componentPropertiesPanel = document.getElementById('component-properties');
+		const propertiesContent = document.getElementById('properties-content');
+		const exportLayoutBtn = document.getElementById('exportLayoutBtn');
+
+		// Layout State Management
+		let layoutState = {
+			background: null,
+			components: []
+		};
+
+		// Component Rendering Functions
+		const componentRenderers = {
+			header: (data) => {
+				const headerEl = document.createElement('div');
+				headerEl.classList.add('component-placeholder', 'header-component');
+				headerEl.innerHTML = `
+                    <h${data.level || 2} class="text-${data.level ? data.level * 2 : 4}xl font-bold mb-2">
+                        ${data.text || 'Heading'}
+                    </h${data.level || 2}>
+                `;
+				return headerEl;
+			},
+			paragraph: (data) => {
+				const paraEl = document.createElement('div');
+				paraEl.classList.add('component-placeholder', 'paragraph-component');
+				paraEl.innerHTML = `
+                    <p class="text-base text-gray-700">
+                        ${data.text || 'Paragraph text goes here'}
+                    </p>
+                `;
+				return paraEl;
+			},
+			section: (data) => {
+				const sectionEl = document.createElement('div');
+				sectionEl.classList.add('component-placeholder', 'section-component', 'border', 'rounded', 'p-4', 'my-4');
+				sectionEl.innerHTML = `
+                    <div class="text-lg font-semibold mb-3">
+                        ${data.title || 'Section Title'}
+                    </div>
+                    <div class="text-gray-600">
+                        ${data.content || 'Section content goes here'}
+                    </div>
+                `;
+				return sectionEl;
+			},
+			text: (data) => {
+				const textEl = document.createElement('div');
+				textEl.classList.add('component-placeholder', 'text-component');
+				textEl.innerHTML = `
+                    <div class="text-base ${data.color || 'text-gray-700'} ${data.fontWeight || 'font-normal'}">
+                        ${data.text || 'Custom Text'}
+                    </div>
+                `;
+				return textEl;
+			},
+			button: (data) => {
+				const buttonEl = document.createElement('div');
+				buttonEl.classList.add('component-placeholder', 'button-component');
+				buttonEl.innerHTML = `
+                    <button class="px-4 py-2 rounded ${data.color || 'bg-orange-500'} ${data.textColor || 'text-white'} hover:${data.hoverColor || 'bg-orange-600'}">
+                        ${data.text || 'Button'}
+                    </button>
+                `;
+				return buttonEl;
+			},
+			image: (data) => {
+				const imageEl = document.createElement('div');
+				imageEl.classList.add('component-placeholder', 'image-component');
+				imageEl.innerHTML = `
+                    <img src="${data.src || '/api/placeholder/400/320'}" 
+                         alt="${data.alt || 'Image'}" 
+                         class="max-w-full h-auto ${data.rounded ? 'rounded-lg' : ''} ${data.border ? 'border' : ''}">
+                `;
+				return imageEl;
+			}
+		};
+
+		// Properties Editors
+		// Add this to the existing script, replacing the previous property editors and adding new functions
+
+		// Updated Property Editors with Real-Time Updates
+		const propertyEditors = {
+			header: (component) => {
+				propertiesContent.innerHTML = `
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Heading Text</label>
+                    <input type="text" id="headerTextInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
+                           value="${component.querySelector('h2, h3, h4, h5, h6').textContent}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Heading Level</label>
+                    <select id="headerLevelSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="2" ${component.querySelector('h2') ? 'selected' : ''}>H2</option>
+                        <option value="3" ${component.querySelector('h3') ? 'selected' : ''}>H3</option>
+                        <option value="4" ${component.querySelector('h4') ? 'selected' : ''}>H4</option>
+                        <option value="5" ${component.querySelector('h5') ? 'selected' : ''}>H5</option>
+                    </select>
+                </div>
+            </div>
+        `;
+
+				// Add event listeners for real-time updates
+				document.getElementById('headerTextInput').addEventListener('input', (e) => {
+					const currentHeading = component.querySelector('h2, h3, h4, h5, h6');
+					currentHeading.textContent = e.target.value;
+				});
+
+				document.getElementById('headerLevelSelect').addEventListener('change', (e) => {
+					const currentHeading = component.querySelector('h2, h3, h4, h5, h6');
+					const newLevel = e.target.value;
+					const newHeading = document.createElement(`h${newLevel}`);
+					newHeading.textContent = currentHeading.textContent;
+					newHeading.className = `text-${newLevel * 2}xl font-bold mb-2`;
+					component.replaceChild(newHeading, currentHeading);
+				});
+			},
+			paragraph: (component) => {
+				propertiesContent.innerHTML = `
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Paragraph Text</label>
+                    <textarea id="paragraphTextInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">${component.querySelector('p').textContent}</textarea>
+                </div>
+            </div>
+        `;
+
+				document.getElementById('paragraphTextInput').addEventListener('input', (e) => {
+					component.querySelector('p').textContent = e.target.value;
+				});
+			},
+			section: (component) => {
+				propertiesContent.innerHTML = `
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Section Title</label>
+                    <input type="text" id="sectionTitleInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
+                           value="${component.querySelector('.text-lg').textContent}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Section Content</label>
+                    <textarea id="sectionContentInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">${component.querySelector('.text-gray-600').textContent}</textarea>
+                </div>
+            </div>
+        `;
+
+				document.getElementById('sectionTitleInput').addEventListener('input', (e) => {
+					component.querySelector('.text-lg').textContent = e.target.value;
+				});
+
+				document.getElementById('sectionContentInput').addEventListener('input', (e) => {
+					component.querySelector('.text-gray-600').textContent = e.target.value;
+				});
+			},
+			text: (component) => {
+				const textDiv = component.querySelector('.text-component div');
+				propertiesContent.innerHTML = `
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Text Content</label>
+                    <input type="text" id="textContentInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
+                           value="${textDiv.textContent}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Text Color</label>
+                    <select id="textColorSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="text-gray-700" ${textDiv.classList.contains('text-gray-700') ? 'selected' : ''}>Gray</option>
+                        <option value="text-black" ${textDiv.classList.contains('text-black') ? 'selected' : ''}>Black</option>
+                        <option value="text-blue-500" ${textDiv.classList.contains('text-blue-500') ? 'selected' : ''}>Blue</option>
+                        <option value="text-green-500" ${textDiv.classList.contains('text-green-500') ? 'selected' : ''}>Green</option>
+                        <option value="text-red-500" ${textDiv.classList.contains('text-red-500') ? 'selected' : ''}>Red</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Font Weight</label>
+                    <select id="textWeightSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="font-normal" ${textDiv.classList.contains('font-normal') ? 'selected' : ''}>Normal</option>
+                        <option value="font-bold" ${textDiv.classList.contains('font-bold') ? 'selected' : ''}>Bold</option>
+                        <option value="font-semibold" ${textDiv.classList.contains('font-semibold') ? 'selected' : ''}>Semi-Bold</option>
+                        <option value="font-light" ${textDiv.classList.contains('font-light') ? 'selected' : ''}>Light</option>
+                    </select>
+                </div>
+            </div>
+        `;
+
+				document.getElementById('textContentInput').addEventListener('input', (e) => {
+					textDiv.textContent = e.target.value;
+				});
+
+				document.getElementById('textColorSelect').addEventListener('change', (e) => {
+					// Remove all text color classes
+            ['text-gray-700', 'text-black', 'text-blue-500', 'text-green-500', 'text-red-500'].forEach(cls => {
+						textDiv.classList.remove(cls);
+					});
+					textDiv.classList.add(e.target.value);
+				});
+
+				document.getElementById('textWeightSelect').addEventListener('change', (e) => {
+					// Remove all font weight classes
+            ['font-normal', 'font-bold', 'font-semibold', 'font-light'].forEach(cls => {
+						textDiv.classList.remove(cls);
+					});
+					textDiv.classList.add(e.target.value);
+				});
+			},
+			button: (component) => {
+				const buttonEl = component.querySelector('button');
+				propertiesContent.innerHTML = `
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Button Text</label>
+                    <input type="text" id="buttonTextInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
+                           value="${buttonEl.textContent}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Button Color</label>
+                    <select id="buttonColorSelect" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <option value="bg-orange-500" ${buttonEl.classList.contains('bg-orange-500') ? 'selected' : ''}>Orange</option>
+                        <option value="bg-blue-500" ${buttonEl.classList.contains('bg-blue-500') ? 'selected' : ''}>Blue</option>
+                        <option value="bg-green-500" ${buttonEl.classList.contains('bg-green-500') ? 'selected' : ''}>Green</option>
+                        <option value="bg-red-500" ${buttonEl.classList.contains('bg-red-500') ? 'selected' : ''}>Red</option>
+                    </select>
+                </div>
+            </div>
+        `;
+
+				document.getElementById('buttonTextInput').addEventListener('input', (e) => {
+					buttonEl.textContent = e.target.value;
+				});
+
+				document.getElementById('buttonColorSelect').addEventListener('change', (e) => {
+					// Remove all background color classes
+            ['bg-orange-500', 'bg-blue-500', 'bg-green-500', 'bg-red-500'].forEach(cls => {
+						buttonEl.classList.remove(cls);
+					});
+					buttonEl.classList.add(e.target.value);
+				});
+			},
+			image: (component) => {
+				const imgEl = component.querySelector('img');
+				propertiesContent.innerHTML = `
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Image URL</label>
+                    <input type="text" id="imageUrlInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
+                           value="${imgEl.src}">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Alt Text</label>
+                    <input type="text" id="imageAltInput" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
+                           value="${imgEl.alt}">
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="roundedCheckbox" class="rounded border-gray-300 text-orange-500 focus:ring-orange-200" 
+                           ${imgEl.classList.contains('rounded-lg') ? 'checked' : ''}>
+                    <label for="roundedCheckbox" class="text-sm text-gray-700">Rounded Corners</label>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="checkbox" id="borderCheckbox" class="rounded border-gray-300 text-orange-500 focus:ring-orange-200"
+                           ${imgEl.classList.contains('border') ? 'checked' : ''}>
+                    <label for="borderCheckbox" class="text-sm text-gray-700">Add Border</label>
+                </div>
+            </div>
+        `;
+
+				document.getElementById('imageUrlInput').addEventListener('input', (e) => {
+					imgEl.src = e.target.value || '/api/placeholder/400/320';
+				});
+
+				document.getElementById('imageAltInput').addEventListener('input', (e) => {
+					imgEl.alt = e.target.value || 'Image';
+				});
+
+				document.getElementById('roundedCheckbox').addEventListener('change', (e) => {
+					imgEl.classList.toggle('rounded-lg', e.target.checked);
+				});
+
+				document.getElementById('borderCheckbox').addEventListener('change', (e) => {
+					imgEl.classList.toggle('border', e.target.checked);
+				});
+			}
+		};
+
+		// Add Preview Functionality
+		function createPreviewModal() {
+			// Create modal container
+			const modalContainer = document.createElement('div');
+			modalContainer.id = 'preview-modal';
+			modalContainer.classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-center', 'justify-center', 'bg-black', 'bg-opacity-50');
+
+			// Create modal content
+			const modalContent = document.createElement('div');
+			modalContent.classList.add('bg-white', 'p-6', 'rounded-lg', 'max-w-4xl', 'w-full', 'max-h-[90vh]', 'overflow-auto', 'relative');
+
+			// Create preview content (clone of canvas)
+			const previewCanvas = canvas.cloneNode(true);
+			previewCanvas.classList.add('preview-canvas');
+
+			// Remove all component-specific classes and placeholders
+			previewCanvas.querySelectorAll('.component-placeholder').forEach(comp => {
+				comp.classList.remove('component-placeholder', 'border-orange-500', 'border-2');
+				comp.removeAttribute('draggable');
+			});
+
+			// Close button
+			const closeButton = document.createElement('button');
+			closeButton.innerHTML = '&times;';
+			closeButton.classList.add('absolute', 'top-2', 'right-2', 'text-2xl', 'text-gray-600', 'hover:text-gray-900');
+			closeButton.addEventListener('click', () => {
+				document.body.removeChild(modalContainer);
+			});
+
+			// Assemble modal
+			modalContent.appendChild(closeButton);
+			modalContent.appendChild(previewCanvas);
+			modalContainer.appendChild(modalContent);
+
+			// Add to body
+			document.body.appendChild(modalContainer);
+		}
+
+		// Add Preview Button to Navigation
+		const previewBtn = document.createElement('button');
+		previewBtn.innerHTML = `
+    <i data-lucide="eye" class="w-4 h-4 mr-1"></i>
+    Preview
+`;
+		previewBtn.classList.add('btn', 'btn-secondary', 'flex', 'items-center', 'space-x-2', 'bg-blue-500', 'text-white', 'px-4', 'py-2', 'rounded-lg', 'hover:bg-blue-600');
+		previewBtn.addEventListener('click', createPreviewModal);
+
+		// Insert Preview Button next to Export Button
+		exportLayoutBtn.parentNode.insertBefore(previewBtn, exportLayoutBtn.nextSibling);
+
+		// Reinitialize Lucide icons to show the new preview button icon
+		lucide.createIcons();
+
+		// Drag and Drop Event Handlers
+		const componentItems = document.querySelectorAll('.component-item');
+		componentItems.forEach(item => {
+			item.addEventListener('dragstart', (e) => {
+				e.dataTransfer.setData('text/plain', item.dataset.type);
+			});
+		});
+
+		canvas.addEventListener('dragover', (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+		});
+
+		canvas.addEventListener('drop', (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+
+			const componentType = e.dataTransfer.getData('text/plain');
+			const newComponent = componentRenderers[componentType]({});
+
+			// Remove placeholder text if first component
+			if (canvas.querySelector('.text-center')) {
+				canvas.innerHTML = '';
+			}
+
+			// Make component draggable and movable
+			newComponent.setAttribute('draggable', 'true');
+			newComponent.addEventListener('dragstart', initComponentDrag);
+			newComponent.addEventListener('click', selectComponent);
+
+			canvas.appendChild(newComponent);
+			updateLayoutState();
+		});
+
+		// Component Selection and Editing
+		function selectComponent(e) {
+			// Remove previous selections
+			canvas.querySelectorAll('.component-placeholder').forEach(comp => {
+				comp.classList.remove('border-orange-500', 'border-2');
+			});
+
+			// Highlight selected component
+			const selectedComponent = e.currentTarget;
+			selectedComponent.classList.add('border-orange-500', 'border-2');
+
+			// Show properties panel
+			componentPropertiesPanel.classList.remove('hidden');
+
+			// Populate properties based on component type
+			const componentType = Array.from(selectedComponent.classList)
+				.find(cls => cls.includes('-component'))
+				.replace('-component', '');
+
+			propertyEditors[componentType](selectedComponent);
+		}
+
+		// Drag functionality for components
+		function initComponentDrag(e) {
+			e.dataTransfer.setData('text/plain', 'move');
+		}
+
+		// Background Image Handling
+		backgroundImageUpload.addEventListener('change', (e) => {
+			const file = e.target.files[0];
+			const reader = new FileReader();
+
+			reader.onload = (event) => {
+				canvas.style.backgroundImage = `url('${event.target.result}')`;
+				layoutState.background = event.target.result;
+			};
+
+			reader.readAsDataURL(file);
+		});
+
+		removeBackgroundBtn.addEventListener('click', () => {
+			canvas.style.backgroundImage = 'none';
+			backgroundImageUpload.value = '';
+			layoutState.background = null;
+		});
+
+		// Background Opacity Handling
+		backgroundOpacity.addEventListener('input', (e) => {
+			const opacity = e.target.value;
+			canvas.style.setProperty('--tw-bg-opacity', opacity);
+		});
+
+		// Export Layout Functionality
+		exportLayoutBtn.addEventListener('click', () => {
+			// Capture current layout state
+			updateLayoutState();
+
+			// Convert to JSON
+			const exportData = JSON.stringify(layoutState, null, 2);
+
+			// Create downloadable file
+			const blob = new Blob([exportData], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = 'ui-layout.json';
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+		});
+
+		// Update Layout State
+		function updateLayoutState() {
+			layoutState.components = Array.from(canvas.children)
+				.filter(el => el.classList.contains('component-placeholder'))
+				.map(component => {
+					const type = Array.from(component.classList)
+						.find(cls => cls.includes('-component'))
+						.replace('-component', '');
+
+					return {
+						type,
+						data: getComponentData(component, type)
+					};
+				});
+		}
+
+		// Extract Component Data
+		function getComponentData(component, type) {
+			switch (type) {
+				case 'header':
+					return {
+						text: component.querySelector('h2, h3, h4, h5, h6').textContent,
+							level: parseInt(component.querySelector('h2, h3, h4, h5, h6').tagName.slice(1))
+					};
+				case 'paragraph':
+					return {
+						text: component.querySelector('p').textContent
+					};
+				case 'section':
+					return {
+						title: component.querySelector('.text-lg').textContent,
+							content: component.querySelector('.text-gray-600').textContent
+					};
+				case 'text':
+					return {
+						text: component.querySelector('.text-component div').textContent,
+							color: component.querySelector('.text-component div').classList.find(cls => cls.startsWith('text-')),
+							fontWeight: component.querySelector('.text-component div').classList.find(cls => cls.startsWith('font-'))
+					};
+				case 'button':
+					return {
+						text: component.querySelector('button').textContent,
+							color: component.querySelector('button').classList.find(cls => cls.startsWith('bg-')),
+							textColor: component.querySelector('button').classList.find(cls => cls.startsWith('text-'))
+					};
+				case 'image':
+					return {
+						src: component.querySelector('img').src,
+							alt: component.querySelector('img').alt,
+							rounded: component.querySelector('img').classList.contains('rounded-lg'),
+							border: component.querySelector('img').classList.contains('border')
+					};
+			}
+		}
+
+		// Initial setup
+		document.addEventListener('DOMContentLoaded', () => {
+			lucide.createIcons();
+		});
+	</script>
+</body>
+
+</html>

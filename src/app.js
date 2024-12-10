@@ -15,6 +15,7 @@
  const mongoSanitize = require("express-mongo-sanitize");
  const ejs = require('ejs');
 
+ const { suscriberNewsletter, unSuscriberNewsletter } = require('../src/controllers/NewsletterControllers.js')
  const { scheduler } = require('../src/controllers/ScheduleControllers.js')
  const { attackMiddleware } = require("./middlewares/security.js");
 
@@ -22,7 +23,7 @@
  const LinkRouter = require("../src/routers/LinkRouters.js");
  const ViewRouter = require("../src/routers/ViewRouters.js")
 
- const MainRouter = express.Router();
+ // const MainRouter = express.Router();
  const app = express();
 
  // Rate Limiting
@@ -121,14 +122,17 @@
  	memoryUsage: process.memoryUsage()
  }));
 
+ //Newsletter controllers
+ app.post('/subscribe', suscriberNewsletter)
+ app.post('/unsuscribe', unSuscriberNewsletter)
+
  // Cron Job Route
  app.post('/nxxx', scheduler);
 
  // Main Routers
- MainRouter.use("/auth", AuthRouter);
- MainRouter.use("/l", LinkRouter);
+ app.use("/auth", AuthRouter);
+ app.use("/l", LinkRouter);
  app.use("/", ViewRouter)
- app.use("/api/v1", MainRouter);
 
  // Global Error Handler
  app.use((err, req, res, next) => {

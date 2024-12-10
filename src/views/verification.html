@@ -3,94 +3,58 @@
 
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>email verification - Videl</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Email Verification - Videl</title>
 	<script src="https://cdn.tailwindcss.com"></script>
-	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+	<style>
+		@media screen and (-webkit-min-device-pixel-ratio: 0) {
+
+			input,
+			select,
+			textarea {
+				font-size: 16px;
+			}
+		}
+	</style>
 </head>
 
-<body class="bg-white min-h-screen">
+<body class="bg-white min-h-screen overflow-x-hidden">
 	<!-- Navigation -->
 	<nav class="fixed w-full z-20 top-0 left-0 border-b border-gray-200 bg-white/90 backdrop-blur-md">
 		<div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 px-4 sm:px-6 lg:px-8">
-			<a href="#" class="flex items-center space-x-3">
+			<a href="/" class="flex items-center space-x-3">
 				<span class="self-center text-xl sm:text-2xl font-semibold whitespace-nowrap text-orange-600">Videl</span>
 			</a>
+			<div class="flex space-x-4">
+				<a href="/contact" class="text-sm text-gray-600 hover:text-orange-600">Contact Us</a>
+				<a href="/terms" class="text-sm text-gray-600 hover:text-orange-600">Terms of Service</a>
+			</div>
 		</div>
 	</nav>
 
-	<!-- Token Verification Section -->
-	<div class="pt-16 sm:pt-24 bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center">
-		<div class="max-w-md w-full mx-4 sm:mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-			<div class="p-6 sm:p-8 text-center">
-				<div class="mb-4 sm:mb-6 flex justify-center">
-					<i data-lucide="key" class="w-12 h-12 sm:w-16 sm:h-16 text-orange-600"></i>
-				</div>
-				<h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3 sm:mb-4">
-					Email verification
+	<!-- Verification Section -->
+	<div class="pt-24 bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+		<div class="max-w-md w-full mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+			<div class="p-6 sm:p-8">
+				<h2 class="text-2xl sm:text-3xl font-extrabold text-center text-gray-900 mb-4">
+					Verify Your Email
 				</h2>
-				<p class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
-					check your email for the the email verification Unverified accounts have a TTL of 1 hour
+				<p class="text-gray-600 text-center mb-4">
+					Please check your email for a verification link. If you don't see it, please check your spam folder.
 				</p>
-
-				<form class="space-y-4 sm:space-y-6">
-					<div class="flex justify-center space-x-2">
-						<input name="token" type="text" placeholder="enter token.." maxlength="4" class="w-full h-12 sm:h-16 text-center text-xl sm:text-2xl border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" required>
-					</div>
-
-					<div>
-						<button type="submit" class="w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm sm:text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-							Verify
-						</button>
-					</div>
-					<div class="text-center">
-						<p class="text-xs sm:text-sm text-gray-600">
-							Token not received?
-							<a href="#" id="requestNewToken" class="font-medium text-gray-400 cursor-not-allowed">
-								request a fresh one (<span id="resendCountdown">30</span>s)
-							</a>
-						</p>
-					</div>
-				</form>
+				<div class="text-center mb-4">
+					<span class="font-medium text-gray-800" id="countdown"></span>
+				</div>
+				<div class="text-center">
+					<a id="requestLink" class="text-sm text-orange-600 hover:text-orange-500 disabled:opacity-50">
+						Request another verification link
+					</a>
+				</div>
 			</div>
 		</div>
 	</div>
 
-	<script>
-		// Initialize Lucide icons
-		lucide.createIcons();
-
-		// Resend Token Countdown
-		function startResendCountdown() {
-			const resendLink = document.getElementById('requestNewToken');
-			const resendCountdown = document.getElementById('resendCountdown');
-			let timer = 30;
-
-			const intervalId = setInterval(function() {
-				resendCountdown.textContent = timer;
-
-				if (--timer < 0) {
-					clearInterval(intervalId);
-					resendLink.classList.remove('text-gray-400', 'cursor-not-allowed');
-					resendLink.classList.add('text-orange-600', 'hover:text-orange-500');
-					resendLink.style.pointerEvents = 'auto';
-					resendCountdown.parentElement.innerHTML = 'Request New Token';
-				}
-			}, 1000);
-		}
-
-		// Start 30-second resend countdown
-		startResendCountdown();
-
-		// Get the single input
-		const input = document.querySelector('input[maxlength="4"]');
-
-		// Numeric input validation
-		input.addEventListener('input', (e) => {
-			// Only allow numeric input
-			e.target.value = e.target.value.replace(/[^A-Za-z]/g, '');
-		});
-	</script>
+	<script src="../public/client/verification.js"> </script>
 </body>
 
 </html>

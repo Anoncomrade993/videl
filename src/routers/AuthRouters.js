@@ -17,14 +17,17 @@ const {
 	getUserProfile,
 	deleteUser,
 	forgotPassword,
-	cancelDeleteUser
+	cancelDeleteUser,
+	signInWithGithub,
+	githubRegistrationCallBack,
+	checkUsername
 } = require('../controllers/AuthControllers.js')
 
 //const { tokenRequestLimiter } = require('../middlewares/security.js')
 
 
 authRouter.post('/register', registerUser);
-authRouter.post('/verification', emailVerification)
+authRouter.get('/verify-email/:token', emailVerification)
 authRouter.post('/signin', loginUser)
 authRouter.post('/signout', requireAuth, logoutUser)
 authRouter.post('/change-email', requireAuth, changeEmail)
@@ -38,7 +41,6 @@ authRouter.post('/request-ce-token', /*tokenRequestLimiter,*/ requireAuth, reque
 authRouter.post('/request-cp-token', /*tokenRequestLimiter, */ requireAuth, request_cp_OTP)
 
 authRouter.get('/profile', requireAuth, getUserProfile)
-
-
-
+authRouter.get('/gh/initialize', signInWithGithub)
+authRouter.get('/check-username', checkUsername)
 module.exports = authRouter;

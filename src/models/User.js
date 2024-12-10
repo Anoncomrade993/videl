@@ -17,6 +17,11 @@ const userSchema = new mongoose.Schema({
 			message: props => `${props.value} is not a valid email!`
 		}
 	},
+	authProviders: {
+		type: String,
+		default: 'local',
+		enum: ['github', 'local']
+	},
 	password: { type: String, required: true },
 	avatar: { type: String, required: false },
 	isVerified: { type: Boolean, default: false },
@@ -36,7 +41,7 @@ userSchema.statics.createUser = async function(data = {}) {
 	try {
 		if (!data || Object.keys(data).length === 0) return { success: false, message: 'Missing data', user: null }
 		data.password = await Scrypt.hashToken(data.password);
-		const user = await this.create({...data});
+		const user = await this.create({ ...data });
 		if (!user) return { success: false, message: 'Error creating user', user: null }
 		return { success: true, message: 'created successfully', user }
 	} catch (databaseError) {

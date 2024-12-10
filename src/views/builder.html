@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>UI Builder - Videl</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+	<style>
+		#canvas {
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			position: relative;
+		}
+
+		#canvas::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(255, 255, 255, 0.7);
+			z-index: 1;
+		}
+
+		#canvas>* {
+			position: relative;
+			z-index: 2;
+			cursor: move;
+		}
+
+		.component-placeholder {
+			border: 2px dashed #orange-500;
+			padding: 10px;
+			margin: 10px 0;
+			background-color: rgba(255, 165, 0, 0.1);
+		}
+	</style>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex flex-col">
+	<nav class="bg-white shadow-sm p-4 flex justify-between items-center">
+		<div class="flex items-center space-x-3">
+			<span class="text-xl font-bold text-orange-600">UI Builder</span>
+		</div>
+		<div class="flex items-center space-x-3">
+			<button id="exportLayoutBtn" class="btn btn-primary flex items-center space-x-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600">
+				<i data-lucide="download" class="w-4 h-4"></i>
+				<span>Export Layout</span>
+			</button>
+		</div>
+	</nav>
+
+	<div class="flex flex-1">
+		<!-- Component Library -->
+		<div class="w-64 bg-white border-r p-4 space-y-4">
+			<h3 class="font-semibold text-gray-700 mb-4">Components</h3>
+			<div class="space-y-2">
+				<div draggable="true" data-type="header" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="heading" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Heading</span>
+				</div>
+				<div draggable="true" data-type="paragraph" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="type" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Paragraph</span>
+				</div>
+				<div draggable="true" data-type="section" class="component-item cursor-grab bg-gray-100 p-2 rounded-lg text-center hover:bg-gray-200 transition flex items-center justify-center">
+					<i data-lucide="layout-template" class="w-6 h-6 mr-2"></i>
+					<span class="text-sm">Section</span>
+				</div>
+				
+			</div>
+		</div>
+
+		<!-- Canvas -->
+		<div class="flex-1 p-8">
+			<div id="canvas" class="bg-white border-2 border-dashed border-gray-300 min-h-[600px] rounded-lg p-4">
+				<div class="text-center text-gray-400">
+					Drag components here
+				</div>
+			</div>
+		</div>
+
+		<!-- Properties Panel -->
+		<div class="w-64 bg-white border-l p-4 space-y-4">
+			<div>
+				<h3 class="font-semibold text-gray-700 mb-4">Background</h3>
+				<div class="bg-gray-100 p-3 rounded-lg">
+					<label class="block text-sm font-medium text-gray-700 mb-2">
+						Background Image
+					</label>
+					<input type="file" id="backgroundImageUpload" accept="image/*" class="block w-full text-sm text-gray-500 
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-full file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-orange-50 file:text-orange-700
+                        hover:file:bg-orange-100">
+					<div class="mt-2 flex items-center space-x-2">
+						<button id="removeBackgroundBtn" class="text-red-500 hover:text-red-700 flex items-center">
+							<i data-lucide="trash" class="w-4 h-4 mr-1"></i>Remove
+						</button>
+					</div>
+				</div>
+				<div class="mt-4 space-y-2">
+					<label class="block text-sm font-medium text-gray-700">Background Opacity</label>
+					<input type="range" id="backgroundOpacity" min="0" max="1" step="0.1" value="0.7" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+				</div>
+			</div>
+
+			<div id="component-properties" class="hidden">
+				<h3 class="font-semibold text-gray-700 mb-4">Component Properties</h3>
+				<div id="properties-content" class="space-y-3">
+					<!-- Dynamic properties will be inserted here -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// Initialize Lucide icons
+		lucide.createIcons();
+
+		const canvas = document.getElementById('canvas');
+		const backgroundImageUpload = document.getElementById('backgroundImageUpload');
+		const removeBackgroundBtn = document.getElementById('removeBackgroundBtn');
+		const backgroundOpacity = document.getElementById('backgroundOpacity');
+		const componentPropertiesPanel = document.getElementById('component-properties');
+		const propertiesContent = document.getElementById('properties-content');
+		const exportLayoutBtn = document.getElementById('exportLayoutBtn');
+
+		// Layout State Management
+		let layoutState = {
+			background: null,
+			components: []
+		};
+
+		// Component Rendering Functions
+		const componentRenderers = {
+			header: (data) => {
+				const headerEl = document.createElement('div');
+				headerEl.classList.add('component-placeholder', 'header-component');
+				headerEl.innerHTML = `
+                    <h${data.level || 2} class="text-${data.level ? data.level * 2 : 4}xl font-bold mb-2">
+                        ${data.text || 'Heading'}
+                    </h${data.level || 2}>
+                `;
+				return headerEl;
+			},
+			paragraph: (data) => {
+				const paraEl = document.createElement('div');
+				paraEl.classList.add('component-placeholder', 'paragraph-component');
+				paraEl.innerHTML = `
+                    <p class="text-base text-gray-700">
+                        ${data.text || 'Paragraph text goes here'}
+                    </p>
+                `;
+				return paraEl;
+			},
+			section: (data) => {
+				const sectionEl = document.createElement('div');
+				sectionEl.classList.add('component-placeholder', 'section-component', 'border', 'rounded', 'p-4', 'my-4');
+				sectionEl.innerHTML = `
+                    <div class="text-lg font-semibold mb-3">
+                        ${data.title || 'Section Title'}
+                    </div>
+                    <div class="text-gray-600">
+                        ${data.content || 'Section content goes here'}
+                    </div>
+                `;
+				return sectionEl;
+			}
+		};
+
+		// Properties Editors
+		const propertyEditors = {
+			header: (component) => {
+				propertiesContent.innerHTML = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Heading Text</label>
+                            <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-300 focus:ring focus:ring-orange-200 focus:ring-opacity-50" 
+                                   value="${component.querySelector('h2, h3, h4, h5, h6').textContent}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Heading Level</label>
+                            <select class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                                <option value="2">H2</option>
+                                <option value="3">H3</option>
+                                <option value="4">H4</option>
+                                <option value="5">H5</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+			},
+			paragraph: (component) => {
+				propertiesContent.innerHTML = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Paragraph Text</label>
+                            <textarea class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">${component.querySelector('p').textContent}</textarea>
+                        </div>
+                    </div>
+                `;
+			},
+			section: (component) => {
+				propertiesContent.innerHTML = `
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Section Title</label>
+                            <input type="text" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" 
+                                   value="${component.querySelector('.text-lg').textContent}">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Section Content</label>
+                            <textarea class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">${component.querySelector('.text-gray-600').textContent}</textarea>
+                        </div>
+                    </div>
+                `;
+			}
+		};
+
+		// Drag and Drop Logic
+		document.querySelectorAll('.component-item').forEach(item => {
+			item.addEventListener('dragstart', (e) => {
+				e.dataTransfer.setData('text/plain', item.dataset.type);
+			});
+		});
+
+		canvas.addEventListener('dragover', (e) => {
+			e.preventDefault();
+			canvas.classList.add('border-orange-300');
+		});
+
+		canvas.addEventListener('dragleave', () => {
+			canvas.classList.remove('border-orange-300');
+		});
+
+		canvas.addEventListener('drop', (e) => {
+			e.preventDefault();
+			canvas.classList.remove('border-orange-300');
+
+			const componentType = e.dataTransfer.getData('text/plain');
+			const newComponent = componentRenderers[componentType]({});
+
+			// Add delete and edit buttons
+			const controlsWrapper = document.createElement('div');
+			controlsWrapper.classList.add('absolute', 'top-0', 'right-0', 'p-2', 'space-x-2');
+			controlsWrapper.innerHTML = `
+                <button class="edit-btn text-blue-500 hover:text-blue-700">
+                    <i data-lucide="edit" class="w-4 h-4"></i>
+                </button>
+                <button class="delete-btn text-red-500 hover:text-red-700">
+                    <i data-lucide="trash" class="w-4 h-4"></i>
+                </button>
+            `;
+			newComponent.style.position = 'relative';
+			newComponent.appendChild(controlsWrapper);
+
+			// Edit button logic
+			const editBtn = controlsWrapper.querySelector('.edit-btn');
+			editBtn.addEventListener('click', () => {
+				componentPropertiesPanel.classList.remove('hidden');
+				propertyEditors[componentType](newComponent);
+			});
+
+			// Delete button logic
+			const deleteBtn = controlsWrapper.querySelector('.delete-btn');
+			deleteBtn.addEventListener('click', () => {
+				newComponent.remove();
+				componentPropertiesPanel.classList.add('hidden');
+			});
+
+			canvas.appendChild(newComponent);
+			lucide.createIcons();
+		});
+
+		// Export Layout
+		exportLayoutBtn.addEventListener('click', () => {
+			const components = Array.from(canvas.children)
+				.filter(el => el.classList.contains('component-placeholder'))
+				.map(component => {
+					const type = Array.from(component.classList)
+						.find(cls => ['header-component', 'paragraph-component', 'section-component'].includes(cls))
+						.replace('-component', '');
+
+					switch (type) {
+						case 'header':
+							return {
+								type: 'header',
+									data: {
+										text: component.querySelector('h2, h3, h4, h5, h6').textContent,
+										level: parseInt(component.querySelector('h2, h3, h4, h5, h6').tagName[1])
+									}
+							};
+						case 'paragraph':
+							return {
+								type: 'paragraph',
+									data: {
+										text: component.querySelector('p').textContent
+									}
+							};
+						case 'section':
+							return {
+								type: 'section',
+									data: {
+										title: component.querySelector('.text-lg').textContent,
+										content: component.querySelector('.text-gray-600').textContent
+									}
+							};
+					}
+				});
+
+			// You can modify this to save to local storage, send to backend, etc.
+			console.log(JSON.stringify(components, null, 2));
+			alert('Layout exported to console! Check browser dev tools.');
+		});
+		// Background Image Upload
+		backgroundImageUpload.addEventListener('change', (e) => {
+			const file = e.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (event) => {
+					canvas.style.backgroundImage = `url('${event.target.result}')`;
+					canvas.classList.add('has-background');
+				};
+				reader.readAsDataURL(file);
+			}
+		});
+
+		// Remove Background
+		removeBackgroundBtn.addEventListener('click', () => {
+			canvas.style.backgroundImage = 'none';
+			backgroundImageUpload.value = ''; // Clear file input
+			canvas.classList.remove('has-background');
+		});
+
+		// Background Opacity
+		backgroundOpacity.addEventListener('input', (e) => {
+			if (canvas.style.backgroundImage) {
+				const overlay = canvas.querySelector('::before');
+				if (overlay) {
+					overlay.style.opacity = e.target.value;
+				}
+			}
+		});
+	</script>
+</body>
+
+</html>

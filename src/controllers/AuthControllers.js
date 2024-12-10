@@ -1,8 +1,10 @@
+const TempSession = require('../models/TempSession.js')
 const Token = require('../models/Token.js')
 const User = require('../models/User.js')
 const Schedule = require('../models/Schedule.js')
 const Scrypt = require('../services/Scrypt.js')
-const { sendJsonResponse } = require('../utility/helpers.js')
+
+const { sendJsonResponse, } = require('../utility/helpers.js')
 const { EMAIL_REGEX } = require('../constants.js')
 const {
 	sendVerifyEmail,
@@ -14,7 +16,7 @@ const {
 
 const { saveSession, destroySession } = require('../middlewares/session.js')
 const generateAvatar = require('../identicons/generator.js')
-
+const axios = require('axios')
 
 module.exports.registerUser = async function(req, res) {
 	try {
@@ -68,38 +70,31 @@ module.exports.registerUser = async function(req, res) {
 	}
 }
 
-
+/*
 module.exports.emailVerification = async function(req, res) {
 	try {
-		const { email, token } = req.body;
+		const { token } = req.params;
 
-		if (!token.trim() || !email.trim()) {
+		if (!token.trim()) {
 			return sendJsonResponse(res, 400, false, 'Provide token for verification process')
 		}
 
-		if (!EMAIL_REGEX.test(email.trim().toLowerCase())) {
-			return sendJsonResponse(res, 400, false, 'Invalid email address')
-		}
-
-		const exists = await User.exists({ email })
-
-		if (!exists) {
-			return sendJsonResponse(res, 400, false, 'Email not matched any user')
-		}
-
-		const { success, message: _ } = await Token.verifyToken({ email, token, purpose: 'verifyEmail' });
-
+		const { status, success, message } = await Token.verifyEmailVerificationToken(token);
 		if (!success) {
-			return sendJsonResponse(res, 400, false, 'Invalid or expired token')
+			return sendJsonResponse(res, status, success, message)
 		}
 		await User.findOneAndUpdate({ email }, { $set: { isVerified: true } });
-		return sendJsonResponse(res, 200, true, 'Email verified successfully')
+		//return sendJsonResponse(res, 200, true, 'Email verified successfully')
+		return res.redirect(302, '/signin')
 	} catch (error) {
 		console.error('Error verifying user email', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error ')
+		//return sendJsonResponse(res, 500, false, 'Internal server error ')
+
 	}
 }
 
+//Under comment now 
+**/
 module.exports.loginUser = async function(req, res) {
 	try {
 		const { email, password } = req.body;
@@ -504,5 +499,385 @@ module.exports.getUserProfile = async function(req, res) {
 	} catch (error) {
 		console.error('Error getting user profile', error)
 		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
+	}
+}
+
+
+
+
+
+module.exports.signInWithGithub = async function(req, res) {
+	try {
+
+		const state = crypto.randomBytes(16).toString('hex');
+		await TempSession.create({ state });
+
+		// Construct GitHub OAuth URL
+		const githubAuthURL = `https://github.com/login/oauth/authorize?` +
+			`client_id=${process.env.GITHUB_CLIENT_ID}` +
+			`&redirect_uri=${process.env.GITHUB_REDIRECT_URI}` +
+			`&scope=user:email` +
+			`&state=${state}`;
+		res.redirect(302, githubAuthURL);
+	} catch (error) {
+		console.error('Error initializing Login with GitHub', error)
+		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
+	}
+}
+
+
+module.exports.githubRegistrationCallBack = async function(req, res) {
+	const { code, state } = req.query;
+
+	if (!code.trim() || !state.trim()) {
+		return sendJsonResponse(res, 400, false, 'Provide needed parameters')
+	}
+
+	const tempSess = await TempSession.findOne({ state });
+
+	// Validate state to prevent CSRF
+	if (!tempSess) {
+		return sendJsonResponse(res, 403, false, 'Invalid state parameter');
+	}
+
+	// Remove state after validation
+	await TempSession.deleteOne({ state });
+
+	try {
+		// Exchange code for access token
+		const tokenResponse = await axios.post('https://github.com/login/oauth/access_token',
+		{
+			client_id: process.env.GITHUB_CLIENT_ID,
+			client_secret: process.env.GITHUB_CLIENT_SECRET,
+			code: code,
+			redirect_uri: process.env.GITHUB_REDIRECT_URI
+		},
+		{
+			headers: { 'Accept': 'application/json' }
+		});
+
+		const { access_token } = tokenResponse.data;
+
+		// Fetch user information
+		const userResponse = await axios.get('https://api.github.com/user', {
+			headers: { 'Authorization': `token ${access_token}` }
+		});
+
+		// Fetch user emails
+		const emailsResponse = await axios.get('https://api.github.com/user/emails', {
+			headers: { 'Authorization': `token ${access_token}` }
+		});
+
+		// Find primary verified email
+		const primaryEmail = emailsResponse.data.find(email =>
+			email.verified && email.primary
+		);
+
+		// Extract user details
+		const githubUser = {
+			username: userResponse.data.login,
+			name: userResponse.data.name,
+			email: primaryEmail ? primaryEmail.email : userResponse.data.email,
+			avatar: userResponse.data.avatar_url
+		};
+
+		// Check if email already exists
+		const existingUser = await User.findOne({
+			email: githubUser.email.trim().toLowerCase()
+		});
+
+		if (existingUser) {
+			// If user exists, log them in
+			req.session.userId = existingUser._id;
+			return res.redirect(302, '/dashboard');
+		}
+
+		// Generate a random password for GitHub users
+		const randomPassword = crypto.randomBytes(16).toString('hex');
+		const password = await Scrypt.hashToken(randomPassword);
+
+
+		// Create new user
+		const newUser = await User.create({
+			username: githubUser.username,
+			email: githubUser.email.trim().toLowerCase(),
+			password: password,
+			isVerified: true,
+			avatar: githubUser.avatar,
+			authProvider: 'github'
+		});
+
+		// Set session for the new user
+		req.session.user = {
+			email: newUser.email,
+			userId: newUser._id,
+			lastLogin: Date.now(),
+			lastAccess: new Date(),
+			isVerified: newUser.isVerified,
+			username: newUser.username
+		}
+		await saveSession(req); //save session 
+		// Redirect to dashboard or profile completion
+		return res.redirect(302, '/dashboard');
+
+	} catch (error) {
+		console.error('GitHub OAuth Error:', error);
+		await destroySession(req)
+		return sendJsonResponse(res, 500, false, 'Authentication failed');
+	}
+}
+
+module.exports.checkUsername = async function(req, res) {
+	try {
+		const username = req.params.username.trim().toLowerCase();
+		if (!username) {
+			return sendJsonResponse(res, 400, false, 'provide username')
+		}
+		const exists = await User.exists({ username });
+		if (exists) {
+			return sendJsonResponse(res, 200, true, 'username in use')
+		}
+		return sendJsonResponse(res, 404, false, 'Username not in use')
+	} catch (error) {
+		console.error('Error checking username existence', error)
+		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
+	}
+}
+
+module.exports.emailVerification = async function(req, res) {
+	try {
+		const { token } = req.params;
+
+		if (!token.trim()) {
+			return res.status(400).send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Email Verification Failed</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                            margin: 0;
+                            background-color: #f5f5f5;
+                        }
+                        .container {
+                            text-align: center;
+                            padding: 2rem;
+                            background-color: white;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            max-width: 90%;
+                            width: 400px;
+                        }
+                        .error-icon {
+                            color: #dc3545;
+                            font-size: 48px;
+                            margin-bottom: 1rem;
+                        }
+                        .message {
+                            color: #333;
+                            margin-bottom: 1.5rem;
+                        }
+                        .button {
+                            background-color: #007bff;
+                            color: white;
+                            padding: 10px 20px;
+                            border-radius: 4px;
+                            text-decoration: none;
+                            display: inline-block;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="error-icon">❌</div>
+                        <h1>Verification Failed</h1>
+                        <p class="message">Invalid verification token. Please provide a valid token.</p>
+                        <a href="/signin" class="button">Go to Sign In</a>
+                    </div>
+                </body>
+                </html>
+            `);
+		}
+
+		const { status, success, message } = await Token.verifyEmailVerificationToken(token);
+		if (!success) {
+			return res.status(status).send(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Email Verification Failed</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                            margin: 0;
+                            background-color: #f5f5f5;
+                        }
+                        .container {
+                            text-align: center;
+                            padding: 2rem;
+                            background-color: white;
+                            border-radius: 8px;
+                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                            max-width: 90%;
+                            width: 400px;
+                        }
+                        .error-icon {
+                            color: #dc3545;
+                            font-size: 48px;
+                            margin-bottom: 1rem;
+                        }
+                        .message {
+                            color: #333;
+                            margin-bottom: 1.5rem;
+                        }
+                        .button {
+                            background-color: #007bff;
+                            color: white;
+                            padding: 10px 20px;
+                            border-radius: 4px;
+                            text-decoration: none;
+                            display: inline-block;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="error-icon">❌</div>
+                        <h1>Verification Failed</h1>
+                        <p class="message">${message}</p>
+                        <a href="/signin" class="button">Go to Sign In</a>
+                    </div>
+                </body>
+                </html>
+            `);
+		}
+
+		await User.findOneAndUpdate({ email }, { $set: { isVerified: true } });
+
+		return res.status(200).send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Email Verification Successful</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        background-color: #f5f5f5;
+                    }
+                    .container {
+                        text-align: center;
+                        padding: 2rem;
+                        background-color: white;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        max-width: 90%;
+                        width: 400px;
+                    }
+                    .success-icon {
+                        color: #28a745;
+                        font-size: 48px;
+                        margin-bottom: 1rem;
+                    }
+                    .message {
+                        color: #333;
+                        margin-bottom: 1.5rem;
+                    }
+                    .button {
+                        background-color: #28a745;
+                        color: white;
+                        padding: 10px 20px;
+                        border-radius: 4px;
+                        text-decoration: none;
+                        display: inline-block;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="success-icon">✅</div>
+                    <h1>Verification Successful</h1>
+                    <p class="message">Your email has been verified successfully!</p>
+                    <a href="/signin" class="button">Go to Sign In</a>
+                </div>
+            </body>
+            </html>
+        `);
+	} catch (error) {
+		console.error('Error verifying user email', error);
+		return res.status(500).send(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Error</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        height: 100vh;
+                        margin: 0;
+                        background-color: #f5f5f5;
+                    }
+                    .container {
+                        text-align: center;
+                        padding: 2rem;
+                        background-color: white;
+                        border-radius: 8px;
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                        max-width: 90%;
+                        width: 400px;
+                    }
+                    .error-icon {
+                        color: #dc3545;
+                        font-size: 48px;
+                        margin-bottom: 1rem;
+                    }
+                    .message {
+                        color: #333;
+                        margin-bottom: 1.5rem;
+                    }
+                    .button {
+                        background-color: #007bff;
+                        color: white;
+                        padding: 10px 20px;
+                        border-radius: 4px;
+                        text-decoration: none;
+                        display: inline-block;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="error-icon">❌</div>
+                    <h1>Something Went Wrong</h1>
+                    <p class="message">An error occurred while verifying your email. Please try again later.</p>
+                    <a href="/signin" class="button">Go to Sign In</a>
+                </div>
+            </body>
+            </html>
+        `);
 	}
 }

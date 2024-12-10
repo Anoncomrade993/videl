@@ -4,13 +4,13 @@ const { requireAuthUI, renderView, handleErrorView } = require('../middlewares/u
 //
 const uiRouter = express.Router();
 
-uiRouter.get('/welcome', renderView('landing'));
-uiRouter.get('/register', renderView('register'));
-uiRouter.get('/signin', renderView('signin'));
-uiRouter.get('/forgotten-password', renderView('forgotten-password'));
+uiRouter.get('/welcome', renderView('Landing.html'));
+uiRouter.get('/register', renderView('register.html'));
+uiRouter.get('/signin', renderView('signin.html'));
+uiRouter.get('/forgotten-password', renderView('forgotten.html'));
 
-uiRouter.get('/terms', renderView('terms'));
-uiRouter.get('/policy', renderView('policy'));
+uiRouter.get('/terms', renderView('terms.html'));
+uiRouter.get('/policy', renderView('policy.html'));
 
 uiRouter.get('/', (req, res) => {
 	if (req.session?.user) {
@@ -23,19 +23,19 @@ uiRouter.get('/', (req, res) => {
             <body></body>
   </html> `);
 	}
-	renderView('landing')(req, res);
+	renderView('Landing.html')(req, res);
 });
 
 
-uiRouter.get('/dashboard', requireAuthUI, renderView('dashboard'));
-uiRouter.get('/change-password', requireAuthUI, renderView('change-password'));
-uiRouter.get('/email-verification', requireAuthUI, renderView('email-verification'));
-uiRouter.get('/cancel-delete-schedule', renderView('cancel-delete-schedule'));
-
-uiRouter.get('/l/:linkId', renderView('link-detail'));
-uiRouter.get('/l/:linkId/captures', requireAuthUI, renderView('link-captures'));
+uiRouter.get('/dashboard', requireAuthUI, renderView('dashboard.html'));
+uiRouter.get('/change-password', requireAuthUI, renderView('change-password.html'));
+uiRouter.get('/verification', requireAuthUI, renderView('verification.html'));
+/*
+uiRouter.get('/cancel-delete-schedule', renderView('cancel-delete-schedule.html'));
+uiRouter.get('/l/:linkId', renderView('link-detail.html'));
+uiRouter.get('/l/:linkId/captures', requireAuthUI, renderView('link-captures.html'));
 uiRouter.get('/l/:linkId/captures/:captureId', requireAuthUI, renderView('capture-detail'));
-
+*/
 uiRouter.use((err, req, res, next) => {
 	console.error('Unhandled Error:', err);
 

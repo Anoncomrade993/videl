@@ -1,7 +1,5 @@
 import Dialog from './Dialog'
 
-
-
 document.addEventListener('DOMContentLoaded', () => {
 	const form = document.querySelector('form');
 	const passwordInput = document.querySelector('input[name="password"]');
@@ -57,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			};
 
 			// Send registration request
-			const response = await fetch('/api/v1/auth/register', {
+			const response = await fetch('/auth/register', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
@@ -78,13 +76,19 @@ document.addEventListener('DOMContentLoaded', () => {
 					type: 'success',
 					onConfirm: () => {
 						form.reset();
-						window.localStorage.setItem('exm', emailInput.value.trim())
-						window.location.href = '/email-verification'
+						window.localStorage.setItem('uemail', JSON.stringify(userData.email))
+						window.location.href = '/verification'
 					}
 				});
 			} else {
 				// Server returned an error
+
 				throw new Error(result.message || 'Registration failed');
+				Dialog.show({
+					title: 'Registration Error',
+					message: result.message || 'Registration failed',
+					type: response.status > 399 && response.status < 500 ? 'warning' : 'error'
+				})
 			}
 
 		} catch (error) {

@@ -167,8 +167,7 @@ function showRegistrationDialog(success) {
 	Dialog.show({
 		title: success ? 'Registration Successful' : 'Registration Failed',
 		message: success ?
-			'Your account has been created successfully!' :
-			'There was an error creating your account.',
+			'Your account has been created successfully!' : 'There was an error creating your account.',
 		type: success ? 'success' : 'error',
 		confirmText: 'Continue',
 		onConfirm: () => {
@@ -180,5 +179,4 @@ function showRegistrationDialog(success) {
 	});
 }
 
-// Export if using modules
-export default Dialog;
+module.exports = Dialog;

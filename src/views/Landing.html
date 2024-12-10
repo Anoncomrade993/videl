@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Videl - Zero Friction Template Hosting</title>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+</head>
+<style>
+	loading {
+		position: relative;
+		cursor: not-allowed;
+		opacity: 0.7;
+	}
+
+	.loading::after {
+		content: '';
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 20px;
+		height: 20px;
+		margin-top: -10px;
+		margin-left: -10px;
+		border: 3px solid rgba(255, 255, 255, 0.3);
+		border-top: 3px solid #ffffff;
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		0% {
+			transform: rotate(0deg);
+		}
+
+		100% {
+			transform: rotate(360deg);
+		}
+	}
+
+	/* Specific to dark backgrounds */
+	.loading {
+		background-color: rgba(0, 0, 0, 0.1) !important;
+	}
+
+	/* Ensure text remains hidden during loading */
+	.loading span,
+	.loading i {
+		visibility: hidden;
+	}
+</style>
+
+<body class="bg-white min-h-screen">
+	<!-- Navigation -->
+	<nav class="fixed w-full z-20 top-0 left-0 border-b border-gray-200 bg-white/90 backdrop-blur-md">
+		<div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+			<a href="/landing" class="flex items-center space-x-3">
+				<span class="self-center text-2xl font-semibold whitespace-nowrap text-orange-600">Videl</span>
+			</a>
+			<div class="flex md:order-2 space-x-3">
+				<a href="/signin" class="text-orange-600 border border-orange-600 hover:bg-orange-50 font-medium rounded-lg text-sm px-4 py-2 text-center">
+					Login
+				</a>
+				<a href="/registration" class="bg-orange-600 text-white hover:bg-orange-700 focus:outline-none font-medium rounded-lg text-sm px-4 py-2 text-center">
+					Get Started
+				</a>
+			</div>
+		</div>
+	</nav>
+
+	<!-- Hero Section -->
+	<header class="pt-24 bg-gradient-to-br from-orange-50 to-orange-100">
+		<div class="max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid lg:grid-cols-12">
+			<div class="mr-auto place-self-center lg:col-span-7">
+				<h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl text-gray-900">
+					Zero Friction Template Hosting
+				</h1>
+				<p class="max-w-2xl mb-6 font-light text-gray-600 lg:mb-8 md:text-lg lg:text-xl">
+					Launch your portfolio, landing page, or business newsletter in minutes. No domain, no hosting hassles – just pure creativity.
+				</p>
+				<div class="flex space-x-4">
+					<button class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white rounded-lg bg-orange-700 hover:bg-orange-800">
+						Create Free Account
+						<i data-lucide="rocket" class="w-5 h-5 ml-2"></i>
+					</button>
+					<button class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-100">
+						Watch Demo
+						<i data-lucide="play" class="w-5 h-5 ml-2"></i>
+					</button>
+				</div>
+				<div class="mt-8 flex items-center space-x-4">
+					<div class="flex -space-x-2">
+						<img class="w-10 h-10 rounded-full border-2 border-white" src="https://via.placeholder.com/40" alt="User">
+						<img class="w-10 h-10 rounded-full border-2 border-white" src="https://via.placeholder.com/40" alt="User">
+						<img class="w-10 h-10 rounded-full border-2 border-white" src="https://via.placeholder.com/40" alt="User">
+					</div>
+					<div>
+						<p class="text-gray-600">Used by 500+ developers</p>
+						<div class="flex text-orange-500">
+							<i data-lucide="star" class="w-4 h-4"></i>
+							<i data-lucide="star" class="w-4 h-4"></i>
+							<i data-lucide="star" class="w-4 h-4"></i>
+							<i data-lucide="star" class="w-4 h-4"></i>
+							<i data-lucide="star" class="w-4 h-4"></i>
+							<span class="ml-2 text-gray-600 text-sm">(4.9/5 rating)</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
+				<img src="https://via.placeholder.com/600x400" alt="Dashboard Preview" class="rounded-xl shadow-2xl transform hover:scale-105 transition-transform">
+			</div>
+		</div>
+	</header>
+
+	<!-- Features Section -->
+	<section class="bg-white py-16">
+		<div class="max-w-screen-xl px-4 mx-auto">
+			<h2 class="text-3xl font-extrabold text-center mb-12 text-gray-900">
+				Your Fastest Path to Online Presence
+			</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+				<div class="text-center p-6 bg-gray-50 rounded-xl hover:shadow-lg transition-all group">
+					<i data-lucide="zap" class="mx-auto mb-4 text-orange-600 w-12 h-12 group-hover:animate-pulse"></i>
+					<h3 class="text-xl font-semibold mb-2">Lightning Fast Deployment</h3>
+					<p class="text-gray-600">Go from code to live site in under 60 seconds. Zero configuration required.</p>
+				</div>
+				<div class="text-center p-6 bg-gray-50 rounded-xl hover:shadow-lg transition-all group">
+					<i data-lucide="git-branch" class="mx-auto mb-4 text-orange-600 w-12 h-12 group-hover:animate-spin"></i>
+					<h3 class="text-xl font-semibold mb-2">Seamless Version Control</h3>
+					<p class="text-gray-600">Integrated Git workflows. Track, rollback, and collaborate effortlessly.</p>
+				</div>
+				<div class="text-center p-6 bg-gray-50 rounded-xl hover:shadow-lg transition-all group">
+					<i data-lucide="shield" class="mx-auto mb-4 text-orange-600 w-12 h-12"></i>
+					<h3 class="text-xl font-semibold mb-2">Enterprise-Grade Security</h3>
+					<p class="text-gray-600">Military-grade encryption. Your templates are safer than Fort Knox.</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Pricing Section -->
+	<section class="bg-gray-50 py-16">
+		<div class="max-w-screen-xl px-4 mx-auto">
+			<h2 class="text-3xl font-extrabold text-center mb-12 text-gray-900">
+				Flexible Pricing Plans
+			</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+				<!-- Free Plan -->
+				<div class="p-6 bg-white border border-gray-200 rounded-xl text-center">
+					<h3 class="text-xl font-semibold mb-4 text-gray-900">Free</h3>
+					<p class="text-md mb-2 text-gray-600">Perfect for Students & Side Projects</p>
+					<p class="text-4xl font-bold mb-6 text-orange-600">$0/mo</p>
+					<ul class="space-y-2 mb-6">
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-orange-600 w-5 h-5"></i>
+							5 Templates (No Credit Card Required)
+						</li>
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-orange-600 w-5 h-5"></i>
+							Free Subdomain (youproject.videl.app)
+						</li>
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-orange-600 w-5 h-5"></i>
+							Community Support Forum
+						</li>
+					</ul>
+					<button class="w-full py-3 rounded-lg bg-orange-600 text-white hover:bg-orange-700">
+						Start Your Project
+					</button>
+				</div>
+
+				<!-- Standard Plan -->
+				<div class="p-6 bg-orange-600 text-white rounded-xl text-center shadow-2xl transform -translate-y-4">
+					<div class="absolute top-0 right-0 m-4 bg-white text-orange-600 px-3 py-1 rounded-full text-sm font-bold">
+						Most Popular
+					</div>
+					<h3 class="text-xl font-semibold mb-4 text-white">Standard</h3>
+					<p class="text-md mb-2 text-orange-100">Ideal for Freelancers & Small Teams</p>
+					<p class="text-4xl font-bold mb-6 text-white">$9/mo</p>
+					<ul class="space-y-2 mb-6">
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-white w-5 h-5"></i>
+							25 Templates
+						</li>
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-white w-5 h-5"></i>
+							Custom Domain Mapping
+						</li>
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-white w-5 h-5"></i>
+							Priority Email Support
+						</li>
+					</ul>
+					<button class="w-full py-3 rounded-lg bg-white text-orange-600 hover:bg-orange-50">
+						Choose Standard
+					</button>
+				</div>
+
+				<!-- Pro Plan -->
+				<div class="p-6 bg-white border border-gray-200 rounded-xl text-center">
+					<h3 class="text-xl font-semibold mb-4 text-gray-900">Pro</h3>
+					<p class="text-md mb-2 text-gray-600">For Growing Businesses & Professionals</p>
+					<p class="text-4xl font-bold mb-6 text-orange-600">$29/mo</p>
+					<ul class="space-y-2 mb-6">
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-orange-600 w-5 h-5"></i>
+							Unlimited Templates
+						</li>
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-orange-600 w-5 h-5"></i>
+							Advanced Analytics
+						</li>
+						<li class="flex items-center justify-center">
+							<i data-lucide="check" class="mr-2 text-orange-600 w-5 h-5"></i>
+							24/7 Dedicated Support
+						</li>
+					</ul>
+					<button class="w-full py-3 rounded-lg bg-orange-600 text-white hover:bg-orange-700">
+						Upgrade to Pro
+					</button>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- Newsletter  -->
+	<section class="bg-gray-900 py-16">
+		<div class="max-w-screen-xl mx-auto px-4">
+			<div class="max-w-2xl mx-auto text-center">
+				<h2 class="text-3xl font-bold text-white mb-4">Stay Updated</h2>
+				<p class="text-orange-100 mb-8">Subscribe to our newsletter for the latest updates</p>
+				<form id="newsletter" class="flex justify-center space-x-2">
+					<input id="email" name="email" type="email" placeholder="Enter your email" class="w-full max-w-md px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white" required>
+					<button type="submit" class="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+						Subscribe
+					</button>
+				</form>
+			</div>
+		</div>
+	</section>
+
+	<!-- Testimonials Section -->
+	<section class="bg-gray-100 py-16">
+		<div class="max-w-screen-xl mx-auto px-4">
+			<h2 class="text-3xl font-extrabold text-center mb-12 text-gray-900">
+				Trusted by Creators Worldwide
+			</h2>
+			<div class="grid md:grid-cols-3 gap-8">
+				<div class="bg-white p-6 rounded-xl shadow-md">
+					<p class="italic mb-4">"Videl cut my deployment time by 80%. As a freelancer, that's game-changing!"</p>
+					<div class="flex items-center">
+						<img src="https://via.placeholder.com/48" class="w-12 h-12 rounded-full mr-4">
+						<div>
+							<p class="font-semibold">Sarah Thompson</p>
+							<p class="text-gray-600">Web Designer</p>
+						</div>
+					</div>
+				</div>
+				<div class="bg-white p-6 rounded-xl shadow-md">
+					<p class="italic mb-4">"Perfect for students like me. Hosting my portfolio was never this easy!"</p>
+					<div class="flex items-center">
+						<img src="https://via.placeholder.com/48" class="w-12 h-12 rounded-full mr-4">
+						<div>
+							<p class="font-semibold">Mike Rodriguez</p>
+							<p class="text-gray-600">Computer Science Student</p>
+						</div>
+					</div>
+				</div>
+				<div class="bg-white p-6 rounded-xl shadow-md">
+					<p class="italic mb-4">"Simplified our startup's template management. Highly recommended!"</p>
+					<div class="flex items-center">
+						<img src="https://via.placeholder.com/48" class="w-12 h-12 rounded-full mr-4">
+						<div>
+							<p class="font-semibold">Emily Chen</p>
+							<p class="text-gray-600">Startup CTO</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- Final CTA -->
+	<section class="bg-gradient-to-r from-orange-600 to-red-500 py-16">
+		<div class="max-w-screen-xl mx-auto px-4 text-center">
+			<h2 class="text-4xl font-bold text-white mb-4">Ready to Launch Faster?</h2>
+			<p class="text-orange-100 mb-8 max-w-2xl mx-auto">
+				Join hundreds of developers, students, and businesses who've simplified their template hosting with Videl.
+			</p>
+			<div class="flex justify-center space-x-4">
+				<button class="bg-white text-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+					Start Free
+				</button>
+				<button class="border-2 border-white text-white px-8 py-3 rounded-lg hover:bg-white hover:text-orange-600 transition">
+					See Pricing
+				</button>
+			</div>
+		</div>
+	</section>
+
+	<!-- Footer -->
+	<footer class="bg-gray-900 text-white py-12">
+		<div class="max-w-screen-xl mx-auto px-4">
+			<div class="grid md:grid-cols-4 gap-8">
+				<div>
+					<h3 class="text-xl font-bold mb-4 text-orange-500">Videl</h3>
+					<p class="text-gray-400 mb-4">Zero friction template hosting for developers, students, and businesses.</p>
+				</div>
+				<div>
+					<h4 class="font-semibold mb-4 text-white">Products</h4>
+					<ul class="space-y-2">
+						<li><a href="#" class="text-gray-400 hover:text-white">Free Hosting</a></li>
+						<li><a href="#" class="text-gray-400 hover:text-white">Standard Plan</a></li>
+						<li><a href="#" class="text-gray-400 hover:text-white">Pro Plan</a></li>
+					</ul>
+				</div>
+				<div>
+					<h4 class="font-semibold mb-4 text-white">Resources</h4>
+					<ul class="space-y-2">
+						<li><a href="#" class="text-gray-400 hover:text-white">Blog</a></li>
+						<li><a href="#" class="text-gray-400 hover:text-white">Support</a></li>
+						<li><a href="#" class="text-gray-400 hover:text-white">Community</a></li>
+					</ul>
+				</div>
+				<div>
+					<h4 class="font-semibold mb-4 text-white">Company</h4>
+					<ul class="space-y-2">
+						<li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+						<li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+						<li><a href="#" class="text-gray-400 hover:text-white">Terms</a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="border-t border-gray-800 mt-8 pt-6 text-center">
+				<div class="flex justify-center space-x-6 mb-4">
+					<a href="#" class="text-gray-400 hover:text-white">
+						<i data-lucide="twitter" class="w-6 h-6"></i>
+					</a>
+					<a href="#" class="text-gray-400 hover:text-white">
+						<i data-lucide="github" class="w-6 h-6"></i>
+					</a>
+					<a href="#" class="text-gray-400 hover:text-white">
+						<i data-lucide="send" class="w-6 h-6"></i>
+					</a>
+				</div>
+				<p class="text-gray-400">&copy; <span>
+						<script>
+							document.writeln(new Date().getFullYear())
+						</script>
+					</span> Videl. All rights reserved.</p>
+			</div>
+		</div>
+	</footer>
+
+	<!-- Scripts -->
+	<script src="../public/client/landing.js"></script>
+	<script>
+		// Initialize Lucide icons
+		lucide.createIcons();
+	</script>
+</body>
+
+</html>
