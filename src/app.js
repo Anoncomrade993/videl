@@ -64,16 +64,17 @@
 
  // Security Middleware
  app.use(helmet({
- 	contentSecurityPolicy: {
- 		directives: {
- 			defaultSrc: ["'self'"],
- 			scriptSrc: ["'self'", "'unsafe-inline'"],
- 			styleSrc: ["'self'", "'unsafe-inline'"],
- 			imgSrc: ["'self'", "data:", "https:"],
- 		},
- 	},
- 	referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
- }));
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+    },
+  },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+}));
+
 
  // Middleware Setup
  app.use(xss());
