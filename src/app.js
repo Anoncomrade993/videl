@@ -47,7 +47,7 @@
  		}
  	},*/
  	methods: ["DELETE", "GET", "POST", "PUT"],
- 	allowedHeaders: ["Content-Type", "Authorization"],
+ 	allowedHeaders: ["Content-Type"],
  	optionsSuccessStatus: 200,
  	credentials: true,
  };
