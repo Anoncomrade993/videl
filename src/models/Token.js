@@ -20,7 +20,7 @@ tokenSchema.index({ createdAt: 1 }, { expiresAfterSeconds: 300 });
 tokenSchema.statics.generateToken = async function(data = {}, length = 8) {
 	try {
 		await this.deleteMany({ email: data.email, isUsed: false, purpose: data.purpose });
-		if (!data || Object.keys(data).length === 0) return { success: false, message: "Missing parameters", plain: null };
+		if (!data || Object.keys(data).length === 0) return { success: false, message: "Missing parameters", plain: null, hashed: null };
 
 		const plain = generate(length)
 		const hashed = await hashToken(plain);
@@ -29,11 +29,11 @@ tokenSchema.statics.generateToken = async function(data = {}, length = 8) {
 			...data,
 			hashed
 		});
-		if (!token) return { success: false, message: "Error creating Token", plain: null,hashed };
-		return { success: true, message: "Token created successfully", plain };
+		if (!token) return { success: false, message: "Error creating Token", plain: null, hashed: null };
+		return { success: true, message: "Token created successfully", plain, hashed };
 	} catch (error) {
 		console.error('Error generating Token ', error);
-		return { success: false, message: "Internal Error Occurred", plain: null };
+		return { success: false, message: "Internal Error Occurred", plain: null, hashed: null };
 	}
 };
 
