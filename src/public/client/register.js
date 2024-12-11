@@ -2,17 +2,23 @@ import Dialog from '../utils/Dialog.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const submitBtn = document.getElementById('submit');
-	const username = document.getElementById('username').value.trim();
-	const email = document.getElementById('email').value.trim();
-	const password = document.getElementById('password').value.trim();
-	const cpassword = document.getElementById('confirm-password').value.trim();
+	const usernameElement = document.getElementById('username');
+	const emailElement = document.getElementById('email');
+	const passwordElement = document.getElementById('password');
+	const cpasswordElement = document.getElementById('confirm-password');
 
 	submitBtn.addEventListener('click', async (event) => {
 		console.log('clicked');
 		clearErrors();
 
+		const username = usernameElement.value.trim();
+		const email = emailElement.value.trim();
+		const password = passwordElement.value.trim();
+		const cpassword = cpasswordElement.value.trim();
 
-		const errors = validateForm(username, email, password, cpassword);
+		const errors = validateForm(usernameElement, emailElement, passwordElement, cpasswordElement, username, email, password, cpassword);
+		console.log(errors);
+
 		if (errors.length > 0) {
 			errors.forEach(error => displayError(error.input, error.message));
 			return;
@@ -27,48 +33,41 @@ document.addEventListener('DOMContentLoaded', () => {
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({
-					username,
-					email,
-					password,
-					cpassword
-				})
+				body: JSON.stringify({ username, email, password, cpassword })
 			});
 
 			if (response.ok) {
-				form.reset();
 				window.localStorage.setItem('uemail', JSON.stringify({ email }));
 				showRegistrationDialog(true);
 				setTimeout(() => {
 					window.location.href = '/verification';
 				}, 2000);
 			} else {
-				// Handle error response
 				const errorData = await response.json();
-				showRegistrationDialog(false); // Show error dialog
+				showRegistrationDialog(false);
 			}
 		} catch (error) {
 			console.error('Registration error:', error);
-			showRegistrationDialog(false); // Show error dialog for network issues
+			showRegistrationDialog(false);
 		} finally {
 			submitBtn.disabled = false;
 			submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 		}
 	});
 
-	function validateForm(username, email, password, confirmPassword) {
+	function validateForm(usernameElement, emailElement, passwordElement, cpasswordElement, username, email, password, confirmPassword) {
 		const errors = [];
 		if (username.length < 3 || username.length > 20) {
-			errors.push({ input: form.username, message: 'Username must be 3-20 characters' });
+			errors.push({ input: usernameElement, message: 'Username must be 3-20 characters' });
 		}
 		if (!validateEmail(email)) {
-			errors.push({ input: form.email, message: 'Invalid email format' });
+			errors.push({ input: emailElement, message: 'Invalid email format' });
 		}
 		if (password.length < 8) {
-			errors.push({ input: form.password, message: 'Password must be at least 8 characters' });
+			errors.push({ input: passwordElement, message: 'Password must be at least 8 characters' });
 		}
 		if (password !== confirmPassword) {
-			errors.push({ input: form.cpassword, message: 'Passwords must match' });
+			errors.push({ input: cpasswordElement, message: 'Passwords must match' });
 		}
 		return errors;
 	}
@@ -97,8 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function showRegistrationDialog(success) {
 		Dialog.show({
 			title: success ? 'Registration Successful' : 'Registration Failed',
-			message: success ?
-				'Your account has been created successfully!' : 'There was an error creating your account.',
+			message: success ? 'Your account has been created successfully!' : 'There was an error creating your account.',
 			type: success ? 'success' : 'error',
 			confirmText: 'Continue',
 			onConfirm: () => {

@@ -179,4 +179,4 @@ function showRegistrationDialog(success) {
 	});
 }
 
-module.exports = Dialog;
+export default Dialog;
