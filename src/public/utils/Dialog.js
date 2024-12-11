@@ -42,8 +42,6 @@ class Dialog {
             </button>
 
             <div class="flex flex-col items-center text-center">
-                ${this.getIconHTML()}
-                
                 <h2 class="text-xl font-bold mb-4 ${this.getTitleColor()}">
                     ${this.options.title}
                 </h2>
@@ -63,29 +61,6 @@ class Dialog {
 		this.setupEventListeners();
 	}
 
-	getIconHTML() {
-		const iconClasses = {
-			info: {
-				color: 'text-blue-500',
-				icon: 'ℹ️'
-			},
-			success: {
-				color: 'text-green-500',
-				icon: '✅'
-			},
-			error: {
-				color: 'text-red-500',
-				icon: '❌'
-			},
-			warning: {
-				color: 'text-yellow-500',
-				icon: '⚠️'
-			}
-		};
-
-		const { color, icon } = iconClasses[this.options.type];
-		return `<div class="text-6xl mb-4 ${color}">${icon}</div>`;
-	}
 
 	getTitleColor() {
 		const colors = {
@@ -161,22 +136,4 @@ class Dialog {
 		return dialog;
 	}
 }
-
-// Example Usage
-function showRegistrationDialog(success) {
-	Dialog.show({
-		title: success ? 'Registration Successful' : 'Registration Failed',
-		message: success ?
-			'Your account has been created successfully!' : 'There was an error creating your account.',
-		type: success ? 'success' : 'error',
-		confirmText: 'Continue',
-		onConfirm: () => {
-			if (success) {
-				// Redirect or do something on success
-				console.log('Navigating to dashboard...');
-			}
-		}
-	});
-}
-
 export default Dialog;

@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const cpasswordElement = document.getElementById('confirm-password');
 
 	submitBtn.addEventListener('click', async (event) => {
-		console.log('clicked');
 		clearErrors();
 
 		const username = usernameElement.value.trim();
@@ -94,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function showRegistrationDialog(success) {
-		Dialog.show({
+		let show = Dialog.show({
 			title: success ? 'Registration Successful' : 'Registration Failed',
 			message: success ? 'Your account has been created successfully!' : 'There was an error creating your account.',
 			type: success ? 'success' : 'error',
@@ -105,5 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			}
 		});
+		setTimeout(() => show.close(), 5000)
 	}
 });
