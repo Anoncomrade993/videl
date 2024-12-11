@@ -41,7 +41,7 @@ module.exports.registerUser = async function(req, res) {
 		if (!success) return sendJsonResponse(res, 500, false, message)
 
 		// Generate verification token
-		const { success: created, message, plain, hashed } = await Token.generateToken({
+		const { success: created, message:_, plain, hashed } = await Token.generateToken({
 			email,
 			purpose: 'verifyEmail'
 		}, 16);
