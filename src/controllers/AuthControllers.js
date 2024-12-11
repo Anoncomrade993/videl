@@ -65,7 +65,7 @@ module.exports.registerUser = async function(req, res) {
 		await TempSession.create({ state });
 
 		// Send verification email
-		await sendVerifyEmail(user.email, { username, verificationLink: `${process.env.BASE_URL}/auth/verify-email/${hashed}/?kaf=${state}` });
+		await sendVerifyEmail(user.email, { username, verificationLink: `${process.env.BASE_URL}/auth/verify-email/${hashed}?kaf=${state}` });
 
 		return sendJsonResponse(res, 201, true, 'User created successfully. Please verify your email.')
 	} catch (error) {
@@ -338,7 +338,7 @@ module.exports.request_ev_OTP = async function(req, res) {
 		await TempSession.create({ state });
 
 		// Send verification email
-		await sendVerifyEmail(isUser.email, { username: isUser.username, verificationLink: `${process.env.BASE_URL}/auth/verify-email/${hashed}/?kaf=${state}` });
+		await sendVerifyEmail(isUser.email, { username: isUser.username, verificationLink: `${process.env.BASE_URL}/auth/verify-email/${hashed}?kaf=${state}` });
 		return sendJsonResponse(res, 201, true, 'check email for token')
 	} catch (error) {
 		console.error('Error generating email verification token ', error)
