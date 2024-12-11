@@ -34,7 +34,7 @@ module.exports.registerUser = async function(req, res) {
 		if (exists) {
 			return sendJsonResponse(res, 400, false, 'Email in use')
 		}
-		avatar = generateAvatar(username);
+		avatar = await generateAvatar(username);
 
 		// Create user
 		const { success, message, user } = await User.createUser({ email, password, username, avatar })
