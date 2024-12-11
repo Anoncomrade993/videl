@@ -629,13 +629,14 @@ module.exports.checkUsername = async function(req, res) {
 /*******DO NOT TOUCH ****/
 //worked hard for it 
 // HTML templates for success and error responses
-const successTemplate = (redirectUrl = '/signin') => `
+const successTemplate = () => `
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+ <meta http-equiv="refresh" content="4;url=/signin">
 	<title>Email Verification Successful - Videl </title>
 	<!-- Favicon -->
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -655,7 +656,6 @@ const successTemplate = (redirectUrl = '/signin') => `
 			</div>
 			<h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">Verification Successful</h1>
 			<p class="text-gray-700 mb-6">Your email has been verified successfully!</p>
-			<a href="${redirectUrl}" class="inline-block px-6 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-200">Go to Sign In</a>
 		</div>
 	</div>
 	<script>
