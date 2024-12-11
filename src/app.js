@@ -18,6 +18,8 @@
  const { suscriberNewsletter, unSuscriberNewsletter } = require('../src/controllers/NewsletterControllers.js')
  const { scheduler } = require('../src/controllers/ScheduleControllers.js')
  const { attackMiddleware } = require("./middlewares/security.js");
+ const { globalErrorHandler, notFoundHandler } = require("./middlewares/ErrorHandler.js");
+
 
  const AuthRouter = require("../src/routers/AuthRouters.js");
  const LinkRouter = require("../src/routers/LinkRouters.js");
@@ -62,7 +64,7 @@
  app.use(express.static(path.join(__dirname, 'public')))
  app.use(express.static(path.join(__dirname, 'public', 'client')));
  app.use(express.static(path.join(__dirname, 'public', 'assets')));
-app.use(express.static(path.join(__dirname, 'public', 'utils')));
+ app.use(express.static(path.join(__dirname, 'public', 'utils')));
 
 
  // Security Middleware
@@ -137,17 +139,8 @@ app.use(express.static(path.join(__dirname, 'public', 'utils')));
 
  // Main Routers
  app.use("/auth", AuthRouter);
- app.use("/l", LinkRouter);
  app.use("/", ViewRouter)
 
- // Global Error Handler
- app.use((err, req, res, next) => {
- 	console.error(err.stack);
- 	res.status(err.status || 500).json({
- 		status: 'error',
- 		message: err.message || 'Something went wrong!',
- 		...(process.env.NODE_ENV === 'development' && { stack: err.stack })
- 	});
- });
-
+ app.use(globalErrorHandler); //error handler 
+ app.use(notFoundHandler); // unknown routes
  module.exports = app;

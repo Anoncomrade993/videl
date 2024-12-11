@@ -1,6 +1,5 @@
 const { sendJsonResponse } = require('../utility/helpers.js')
 
-
 module.exports.sessionMiddleware = function(req, res, next) {
 	const now = Date.now();
 
@@ -105,3 +104,5 @@ module.exports.requireAuth = function(req, res, next) {
 		return res.status(500).json({ message: "Internal Server Error Occurred" });
 	}
 }
+
+

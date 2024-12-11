@@ -17,19 +17,19 @@ const tokenSchema = new mongoose.Schema({
 
 tokenSchema.index({ createdAt: 1 }, { expiresAfterSeconds: 300 });
 
-tokenSchema.statics.generateToken = async function(data = {}) {
+tokenSchema.statics.generateToken = async function(data = {}, length = 8) {
 	try {
 		await this.deleteMany({ email: data.email, isUsed: false, purpose: data.purpose });
 		if (!data || Object.keys(data).length === 0) return { success: false, message: "Missing parameters", plain: null };
 
-		const plain = generate();
+		const plain = generate(length)
 		const hashed = await hashToken(plain);
 
 		const token = await this.create({
 			...data,
 			hashed
 		});
-		if (!token) return { success: false, message: "Error creating Token", plain: null };
+		if (!token) return { success: false, message: "Error creating Token", plain: null,hashed };
 		return { success: true, message: "Token created successfully", plain };
 	} catch (error) {
 		console.error('Error generating Token ', error);

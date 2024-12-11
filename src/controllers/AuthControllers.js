@@ -41,10 +41,10 @@ module.exports.registerUser = async function(req, res) {
 		if (!success) return sendJsonResponse(res, 500, false, message)
 
 		// Generate verification token
-		const { success: created, message: _, plain } = await Token.generateToken({
+		const { success: created, message: _, __, hashed } = await Token.generateToken({
 			email,
 			purpose: 'verifyEmail'
-		});
+		}, 16);
 
 		if (!created) {
 			return sendJsonResponse(res, 500, false, 'Internal server error occurred ')
@@ -61,8 +61,11 @@ module.exports.registerUser = async function(req, res) {
 		}
 		await saveSession(req);
 
+		const state = crypto.randomBytes(16).toString('hex');
+		await TempSession.create({ state });
+
 		// Send verification email
-		await sendVerifyEmail(user.email, { username, verificationLink: `${process.env.BASE_URL}/auth/verify-email/${encodeURIComponent(plain)}` });
+		await sendVerifyEmail(user.email, { username, verificationLink: `${process.env.BASE_URL}/verify-email/${hashed}/?kaf=${state}` });
 
 		return sendJsonResponse(res, 201, true, 'User created successfully. Please verify your email.')
 	} catch (error) {
@@ -71,31 +74,7 @@ module.exports.registerUser = async function(req, res) {
 	}
 }
 
-/*
-module.exports.emailVerification = async function(req, res) {
-	try {
-		const { token } = req.params;
 
-		if (!token.trim()) {
-			return sendJsonResponse(res, 400, false, 'Provide token for verification process')
-		}
-
-		const { status, success, message } = await Token.verifyEmailVerificationToken(token);
-		if (!success) {
-			return sendJsonResponse(res, status, success, message)
-		}
-		await User.findOneAndUpdate({ email }, { $set: { isVerified: true } });
-		//return sendJsonResponse(res, 200, true, 'Email verified successfully')
-		return res.redirect(302, '/signin')
-	} catch (error) {
-		console.error('Error verifying user email', error)
-		//return sendJsonResponse(res, 500, false, 'Internal server error ')
-
-	}
-}
-
-//Under comment now 
-**/
 module.exports.loginUser = async function(req, res) {
 	try {
 		const { email, password } = req.body;
@@ -599,7 +578,6 @@ module.exports.githubRegistrationCallBack = async function(req, res) {
 		const password = await Scrypt.hashToken(randomPassword);
 
 
-		// Create new user
 		const newUser = await User.create({
 			username: githubUser.username,
 			email: githubUser.email.trim().toLowerCase(),
@@ -609,7 +587,6 @@ module.exports.githubRegistrationCallBack = async function(req, res) {
 			authProvider: 'github'
 		});
 
-		// Set session for the new user
 		req.session.user = {
 			email: newUser.email,
 			userId: newUser._id,
@@ -619,7 +596,6 @@ module.exports.githubRegistrationCallBack = async function(req, res) {
 			username: newUser.username
 		}
 		await saveSession(req); //save session 
-		// Redirect to dashboard or profile completion
 		return res.redirect(302, '/dashboard');
 
 	} catch (error) {
@@ -646,240 +622,161 @@ module.exports.checkUsername = async function(req, res) {
 	}
 }
 
-module.exports.emailVerification = async function(req, res) {
+/*******DO NOT TOUCH ****/
+//worked hard for it 
+// HTML templates for success and error responses
+const successTemplate = (redirectUrl = '/signin') => `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 400px;
+        }
+        .success-icon {
+            color: #28a745;
+            font-size: 48px;
+            margin-bottom: 1rem;
+        }
+        .message {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        .button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✅</div>
+        <h1>Verification Successful</h1>
+        <p class="message">Your email has been verified successfully!</p>
+        <a href="${redirectUrl}" class="button">Go to Sign In</a>
+    </div>
+</body>
+</html>
+`;
+
+const errorTemplate = (redirectUrl = '/signin') => `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            text-align: center;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 90%;
+            width: 400px;
+        }
+        .error-icon {
+            color: #dc3545;
+            font-size: 48px;
+            margin-bottom: 1rem;
+        }
+        .message {
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="error-icon">❌</div>
+        <h1>Something Went Wrong</h1>
+        <p class="message">An error occurred while verifying your email. Please try again later.</p>
+        <a href="${redirectUrl}" class="button">Go to Sign In</a>
+    </div>
+</body>
+</html>
+`;
+
+/**
+ * Handles email verification process
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} HTTP response with verification status
+ */
+module.exports.emailVerification = async (req, res) => {
 	try {
-		const token = req.params.token.trim();
+		// Validate input parameters
+		const token = req.params.token?.trim();
+		const csrf = req.query.kaf?.trim();
 
-		if (!token) {
-			return res.status(400).send(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Email Verification Failed</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            height: 100vh;
-                            margin: 0;
-                            background-color: #f5f5f5;
-                        }
-                        .container {
-                            text-align: center;
-                            padding: 2rem;
-                            background-color: white;
-                            border-radius: 8px;
-                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                            max-width: 90%;
-                            width: 400px;
-                        }
-                        .error-icon {
-                            color: #dc3545;
-                            font-size: 48px;
-                            margin-bottom: 1rem;
-                        }
-                        .message {
-                            color: #333;
-                            margin-bottom: 1.5rem;
-                        }
-                        .button {
-                            background-color: #007bff;
-                            color: white;
-                            padding: 10px 20px;
-                            border-radius: 4px;
-                            text-decoration: none;
-                            display: inline-block;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="error-icon">❌</div>
-                        <h1>Verification Failed</h1>
-                        <p class="message">Invalid verification token. Please provide a valid token.</p>
-                        <a href="/signin" class="button">Go to Sign In</a>
-                    </div>
-                </body>
-                </html>
-            `);
+		if (!token || !csrf) {
+			return res.status(400).send(errorTemplate());
 		}
-		const decodedToken = decodeURIComponent(token)
-		const { status, success, message } = await Token.verifyEmailVerificationToken(decodedToken);
+
+		// Check CSRF token
+		const tempSess = await TempSession.findOne({ state: csrf });
+		if (!tempSess) {
+			return res.status(403).send(errorTemplate());
+		}
+
+		// Remove state after validation to prevent reuse
+		await TempSession.deleteOne({ state: csrf });
+
+		// Verify email token
+		const { status, success, message, email } = await Token.verifyEmailVerificationToken(token);
+
 		if (!success) {
-			return res.status(status).send(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <title>Email Verification Failed</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            height: 100vh;
-                            margin: 0;
-                            background-color: #f5f5f5;
-                        }
-                        .container {
-                            text-align: center;
-                            padding: 2rem;
-                            background-color: white;
-                            border-radius: 8px;
-                            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                            max-width: 90%;
-                            width: 400px;
-                        }
-                        .error-icon {
-                            color: #dc3545;
-                            font-size: 48px;
-                            margin-bottom: 1rem;
-                        }
-                        .message {
-                            color: #333;
-                            margin-bottom: 1.5rem;
-                        }
-                        .button {
-                            background-color: #007bff;
-                            color: white;
-                            padding: 10px 20px;
-                            border-radius: 4px;
-                            text-decoration: none;
-                            display: inline-block;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="container">
-                        <div class="error-icon">❌</div>
-                        <h1>Verification Failed</h1>
-                        <p class="message">${message}</p>
-                        <a href="/signin" class="button">Go to Sign In</a>
-                    </div>
-                </body>
-                </html>
-            `);
+			return res.status(status).send(errorTemplate());
 		}
 
+		// Update user verification status
 		await User.findOneAndUpdate({ email }, { $set: { isVerified: true } });
 
-		return res.status(200).send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Email Verification Successful</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        margin: 0;
-                        background-color: #f5f5f5;
-                    }
-                    .container {
-                        text-align: center;
-                        padding: 2rem;
-                        background-color: white;
-                        border-radius: 8px;
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                        max-width: 90%;
-                        width: 400px;
-                    }
-                    .success-icon {
-                        color: #28a745;
-                        font-size: 48px;
-                        margin-bottom: 1rem;
-                    }
-                    .message {
-                        color: #333;
-                        margin-bottom: 1.5rem;
-                    }
-                    .button {
-                        background-color: #28a745;
-                        color: white;
-                        padding: 10px 20px;
-                        border-radius: 4px;
-                        text-decoration: none;
-                        display: inline-block;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="success-icon">✅</div>
-                    <h1>Verification Successful</h1>
-                    <p class="message">Your email has been verified successfully!</p>
-                    <a href="/signin" class="button">Go to Sign In</a>
-                </div>
-            </body>
-            </html>
-        `);
+		// Send success response
+		return res.status(200).send(successTemplate());
+
 	} catch (error) {
 		console.error('Error verifying user email', error);
-		return res.status(500).send(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>Error</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        height: 100vh;
-                        margin: 0;
-                        background-color: #f5f5f5;
-                    }
-                    .container {
-                        text-align: center;
-                        padding: 2rem;
-                        background-color: white;
-                        border-radius: 8px;
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-                        max-width: 90%;
-                        width: 400px;
-                    }
-                    .error-icon {
-                        color: #dc3545;
-                        font-size: 48px;
-                        margin-bottom: 1rem;
-                    }
-                    .message {
-                        color: #333;
-                        margin-bottom: 1.5rem;
-                    }
-                    .button {
-                        background-color: #007bff;
-                        color: white;
-                        padding: 10px 20px;
-                        border-radius: 4px;
-                        text-decoration: none;
-                        display: inline-block;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <div class="error-icon">❌</div>
-                    <h1>Something Went Wrong</h1>
-                    <p class="message">An error occurred while verifying your email. Please try again later.</p>
-                    <a href="/signin" class="button">Go to Sign In</a>
-                </div>
-            </body>
-            </html>
-        `);
+		return res.status(500).send(errorTemplate());
 	}
-}
+};

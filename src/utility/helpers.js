@@ -2,7 +2,7 @@ function generateRandomString(length = 0, charset = '') {
 	return Array.from({ length }, () => charset.charAt(Math.floor(Math.random() * charset.length))).join('');
 }
 
-function generate(long = 4) {
+function generate(long = 8) {
 	return generateRandomString(long, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 }
 

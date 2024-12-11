@@ -29,8 +29,7 @@ const userSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-	killDate: { type: Date, default: null },
-	links: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Link' }]
+		links: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Link' }]
 }, { timestamps: true })
 
 userSchema.index({ createdAt: 1 })

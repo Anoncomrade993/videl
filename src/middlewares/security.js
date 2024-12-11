@@ -6,7 +6,8 @@
  * @Author - MockingBugs
  */
 require('dotenv').config();
-const rateLimit = require('express-rate-limiter')
+const rateLimit = require('express-rate-limit');
+
 const { sendJsonResponse } = require('../utility/helpers.js')
 const { logAuditAction } = require('./audit.js')
 
@@ -58,20 +59,17 @@ module.exports.attackMiddleware = async function(req, res, next) {
 	next();
 };
 
-
-
-module.exports.tokenRequestLimiter = () => {
-	return rateLimit({
-		windowMs: 10 * 60 * 1000, //10min cool down 
-		max: 15, // max numbers of request 
-		message: 'Too many token requests, please try again later',
-		standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-		legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-		handler: (req, res) => {
-			res.status(429).json({
-				error: 'Too many requests, please try again later',
-				blockedAt: new Date().toISOString()
-			});
-		}
-	});
-};
+// Token request rate limiter
+module.exports.tokenRequestLimiter = rateLimit({
+	windowMs: 60 * 60 * 1000, // 1 hour window
+	max: 3, // limit each IP to 3 token requests per hour
+	message: {
+		error: 'Too Many Token Requests',
+		message: 'You have exceeded the token request limit. Please try again later.'
+	},
+	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+	handler: (req, res, next, options) => {
+		res.status(429).json(options.message);
+	}
+});
