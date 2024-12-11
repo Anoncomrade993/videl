@@ -1,19 +1,18 @@
 import Dialog from '../utils/Dialog.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-	const form = document.getElementById('registration-form');
 	const submitBtn = document.getElementById('submit');
+	const username = document.getElementById('username').value.trim();
+	const email = document.getElementById('email').value.trim();
+	const password = document.getElementById('password').value.trim();
+	const cpassword = document.getElementById('confirm-password').value.trim();
 
-	form.addEventListener('submit', async (event) => {
-		event.preventDefault(); 
+	submitBtn.addEventListener('click', async (event) => {
+		console.log('clicked');
 		clearErrors();
 
-		const username = form.username.value.trim();
-		const email = form.email.value.trim();
-		const password = form.password.value.trim();
-		const confirmPassword = form.cpassword.value.trim();
 
-		const errors = validateForm(username, email, password, confirmPassword);
+		const errors = validateForm(username, email, password, cpassword);
 		if (errors.length > 0) {
 			errors.forEach(error => displayError(error.input, error.message));
 			return;
@@ -31,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				body: JSON.stringify({
 					username,
 					email,
-					password
+					password,
+					cpassword
 				})
 			});
 
