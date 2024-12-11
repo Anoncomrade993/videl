@@ -631,125 +631,80 @@ module.exports.checkUsername = async function(req, res) {
 // HTML templates for success and error responses
 const successTemplate = (redirectUrl = '/signin') => `
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification Successful</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
-        .container {
-            text-align: center;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 90%;
-            width: 400px;
-        }
-        .success-icon {
-            color: #28a745;
-            font-size: 48px;
-            margin-bottom: 1rem;
-        }
-        .message {
-            color: #333;
-            margin-bottom: 1.5rem;
-        }
-        .button {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            display: inline-block;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Email Verification Successful - Videl </title>
+	<!-- Favicon -->
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<!-- Fallback favicons  -->
+	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
+	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
+	<title>Videl - Zero Friction Template Hosting</title>
+	<link rel="stylesheet" href="/styles.css">
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="success-icon">✅</div>
-        <h1>Verification Successful</h1>
-        <p class="message">Your email has been verified successfully!</p>
-        <a href="${redirectUrl}" class="button">Go to Sign In</a>
-    </div>
+
+<body class="bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center justify-center">
+	<div class="max-w-md w-full mx-auto bg-white rounded-xl shadow-2xl p-6 sm:p-8">
+		<div class="text-center">
+			<div class="text-green-500 text-6xl mb-4">
+				<i data-lucide="check-circle"></i>
+			</div>
+			<h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">Verification Successful</h1>
+			<p class="text-gray-700 mb-6">Your email has been verified successfully!</p>
+			<a href="${redirectUrl}" class="inline-block px-6 py-3 text-white bg-green-600 rounded-lg hover:bg-green-700 transition duration-200">Go to Sign In</a>
+		</div>
+	</div>
+	<script>
+		lucide.createIcons();
+	</script>
 </body>
+
 </html>
 `;
 
 const errorTemplate = (redirectUrl = '/signin') => `
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
-        .container {
-            text-align: center;
-            padding: 2rem;
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            max-width: 90%;
-            width: 400px;
-        }
-        .error-icon {
-            color: #dc3545;
-            font-size: 48px;
-            margin-bottom: 1rem;
-        }
-        .message {
-            color: #333;
-            margin-bottom: 1.5rem;
-        }
-        .button {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
-            text-decoration: none;
-            display: inline-block;
-        }
-    </style>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>Email verification error - Videl </title>
+	<!-- Favicon -->
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<!-- Fallback favicons  -->
+	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
+	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
+	<link rel="stylesheet" href="/styles.css">
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="error-icon">❌</div>
-        <h1>Something Went Wrong</h1>
-        <p class="message">An error occurred while verifying your email. Please try again later.</p>
-        <a href="${redirectUrl}" class="button">Go to Sign In</a>
-    </div>
+
+<body class="bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center justify-center">
+	<div class="max-w-md w-full mx-auto bg-white rounded-xl shadow-2xl p-6 sm:p-8">
+		<div class="text-center">
+			<div class="text-red-500 text-6xl mb-4">
+				<i data-lucide="x-circle"></i>
+			</div>
+			<h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">Something Went Wrong</h1>
+			<p class="text-gray-700 mb-6">An error occurred while verifying your email. Please try again later.</p>
+			<a href="${redirectUrl}" class="inline-block px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-200">Go to Sign In</a>
+		</div>
+	</div>
+	<script>
+		lucide.createIcons();
+	</script>
 </body>
+
 </html>
 `;
 
-/**
- * Handles email verification process
- * @param {Object} req - Express request object
- * @param {Object} res - Express response object
- * @returns {Object} HTTP response with verification status
- */
+
 module.exports.emailVerification = async (req, res) => {
 	try {
-		// Validate input parameters
 		const token = req.params.token?.trim();
 		const csrf = req.query.kaf?.trim();
 
@@ -757,26 +712,18 @@ module.exports.emailVerification = async (req, res) => {
 			return res.status(400).send(errorTemplate());
 		}
 
-		// Check CSRF token
 		const tempSess = await TempSession.findOne({ state: csrf });
 		if (!tempSess) {
 			return res.status(403).send(errorTemplate());
 		}
 
-		// Remove state after validation to prevent reuse
 		await TempSession.deleteOne({ state: csrf });
 
-		// Verify email token
-		const { status, success, message, email } = await Token.verifyEmailVerificationToken(token);
+		const { status, success, message } = await Token.verifyEmailVerificationToken(token);
 
 		if (!success) {
 			return res.status(status).send(errorTemplate());
 		}
-
-		// Update user verification status
-		await User.findOneAndUpdate({ email }, { $set: { isVerified: true } });
-
-		// Send success response
 		return res.status(200).send(successTemplate());
 
 	} catch (error) {
