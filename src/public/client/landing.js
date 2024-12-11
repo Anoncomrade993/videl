@@ -12,8 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	form.addEventListener('submit', async function(event) {
-		event.preventDefault();
-
+		 event.preventDefault();
 		// Disable submit button to prevent multiple submissions
 		const submitButton = form.querySelector('button[type="submit"]');
 		submitButton.disabled = true;

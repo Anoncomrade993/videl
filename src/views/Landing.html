@@ -4,7 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<!-- Favicon - using our SVG logo -->
+	<!-- Favicon -->
 
 	<link rel="icon" href="/favicon.ico" type="image/x-icon">
 	<!-- Fallback favicons  -->
@@ -238,7 +238,7 @@
 			<div class="max-w-2xl mx-auto text-center">
 				<h2 class="text-3xl font-bold text-white mb-4">Stay Updated</h2>
 				<p class="text-orange-100 mb-8">Subscribe to our newsletter for the latest updates</p>
-				<form id="newsletter" class="flex justify-center space-x-2">
+				<form method="POST" action="/suscribe" id="newsletter" class="flex justify-center space-x-2">
 					<input id="email" name="email" type="email" placeholder="Enter your email" class="w-full max-w-md px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white" required>
 					<button type="submit" class="bg-orange-600 text-white px-6 py-3 rounded-lg hover:bg-gray-800 transition-colors">
 						Subscribe
@@ -362,9 +362,9 @@
 	</footer>
 
 	<!-- Scripts -->
-	<script src="/landing.js"></script>
+	<script type="module" src="/client/landing.js"></script>
 	<script>
-		
+		lucide.createIcon();
 	</script>
 </body>
 
