@@ -15,7 +15,17 @@ document.addEventListener('DOMContentLoaded', () => {
 		const password = passwordElement.value.trim();
 		const cpassword = cpasswordElement.value.trim();
 
-		const errors = validateForm(usernameElement, emailElement, passwordElement, cpasswordElement, username, email, password, cpassword);
+		const errors = validateForm(
+			usernameElement,
+			emailElement,
+			passwordElement,
+			cpasswordElement,
+			username,
+			email,
+			password,
+			cpassword
+		);
+
 		console.log(errors);
 
 		if (errors.length > 0) {
@@ -32,70 +42,130 @@ document.addEventListener('DOMContentLoaded', () => {
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ username, email, password, cpassword })
+				body: JSON.stringify({
+					username,
+					email,
+					password,
+					cpassword
+				})
 			});
 
 			if (response.ok) {
+				// Successful registration
 				window.localStorage.setItem('uemail', JSON.stringify({ email }));
 				showRegistrationDialog(true);
+
 				setTimeout(() => {
 					window.location.href = '/verification';
 				}, 2000);
 			} else {
-				const errorData = await response.json();
-				showRegistrationDialog(false);
+				let errorMessage = 'Registration failed';
+				try {
+					const errorData = await response.json();
+					errorMessage = errorData.message ||
+						`Error ${response.status}: ${response.statusText}`;
+				} catch (parseError) {
+					errorMessage = `Error ${response.status}: ${response.statusText}`;
+				}
+
+				showRegistrationDialog(false, errorMessage);
 			}
 		} catch (error) {
 			console.error('Registration error:', error);
-			showRegistrationDialog(false);
+			showRegistrationDialog(false, 'Network error. Please try again.');
 		} finally {
 			submitBtn.disabled = false;
 			submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 		}
 	});
 
-	function validateForm(usernameElement, emailElement, passwordElement, cpasswordElement, username, email, password, confirmPassword) {
+
+	function validateForm(
+		usernameElement,
+		emailElement,
+		passwordElement,
+		cpasswordElement,
+		username,
+		email,
+		password,
+		confirmPassword
+	) {
 		const errors = [];
+
+		// Username validation
 		if (username.length < 3 || username.length > 20) {
-			errors.push({ input: usernameElement, message: 'Username must be 3-20 characters' });
+			errors.push({
+				input: usernameElement,
+				message: 'Username must be 3-20 characters'
+			});
 		}
+
+		// Email validation
 		if (!validateEmail(email)) {
-			errors.push({ input: emailElement, message: 'Invalid email format' });
+			errors.push({
+				input: emailElement,
+				message: 'Invalid email format'
+			});
 		}
+
+		// Password validation
 		if (password.length < 8) {
-			errors.push({ input: passwordElement, message: 'Password must be at least 8 characters' });
+			errors.push({
+				input: passwordElement,
+				message: 'Password must be at least 8 characters'
+			});
 		}
+
+		// Confirm password validation
 		if (password !== confirmPassword) {
-			errors.push({ input: cpasswordElement, message: 'Passwords must match' });
+			errors.push({
+				input: cpasswordElement,
+				message: 'Passwords must match'
+			});
 		}
+
 		return errors;
 	}
+
 
 	function validateEmail(email) {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		return emailRegex.test(email);
 	}
 
+
 	function displayError(input, message) {
 		let errorElement = input.nextElementSibling;
+
 		if (!errorElement || !errorElement.classList.contains('error-message')) {
 			errorElement = document.createElement('div');
-			errorElement.classList.add('error-message', 'text-red-500', 'text-xs', 'mt-1');
+			errorElement.classList.add(
+				'error-message',
+				'text-red-500',
+				'text-xs',
+				'mt-1'
+			);
 			input.parentNode.insertBefore(errorElement, input.nextSibling);
 		}
+
 		errorElement.textContent = message;
 		input.classList.add('border-red-500');
 	}
 
+
+
 	function clearErrors() {
 		document.querySelectorAll('.error-message').forEach(el => el.remove());
-		document.querySelectorAll('.border-red-500').forEach(el => el.classList.remove('border-red-500'));
+		document.querySelectorAll('.border-red-500')
+			.forEach(el => el.classList.remove('border-red-500'));
 	}
 
-	function showRegistrationDialog(success) {
-		let show = Dialog.show({
+
+	function showRegistrationDialog(success, customMessage) {
+		const dialogConfig = {
 			title: success ? 'Registration Successful' : 'Registration Failed',
-			message: success ? 'Your account has been created successfully!' : 'There was an error creating your account.',
+			message: success ?
+				'Your account has been created successfully!' : (customMessage || 'There was an error creating your account.'),
 			type: success ? 'success' : 'error',
 			confirmText: 'Continue',
 			onConfirm: () => {
@@ -103,7 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
 					console.log('Navigating to verification...');
 				}
 			}
-		});
-		setTimeout(() => show.close(), 5000)
+		};
+
+		Dialog.show(dialogConfig);
+		
 	}
 });

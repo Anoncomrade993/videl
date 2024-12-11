@@ -1,15 +1,10 @@
-// dialog.js
 class Dialog {
 	constructor(options = {}) {
 		this.options = {
 			title: options.title || 'Notification',
 			message: options.message || '',
 			type: options.type || 'info', // info, success, error, warning
-			confirmText: options.confirmText || 'OK',
-			cancelText: options.cancelText || 'Cancel',
-			showCancel: options.showCancel || false,
-			onConfirm: options.onConfirm || (() => {}),
-			onCancel: options.onCancel || (() => {})
+			duration: options.duration || 3000
 		};
 
 		this.init();
@@ -20,47 +15,42 @@ class Dialog {
 		this.dialogOverlay = document.createElement('div');
 		this.dialogContainer = document.createElement('div');
 
-		// Set base styles
+		// Base styles with inflation and loader effect
 		this.dialogOverlay.classList.add(
 			'fixed', 'inset-0', 'bg-black', 'bg-opacity-50',
-			'z-50', 'flex', 'items-center', 'justify-center'
+			'z-50', 'flex', 'items-center', 'justify-center',
+			'opacity-0', 'transition-opacity', 'duration-300'
 		);
 
 		this.dialogContainer.classList.add(
 			'bg-white', 'rounded-lg', 'shadow-xl',
-			'p-6', 'w-96', 'relative', 'max-w-md'
+			'p-6', 'w-96', 'relative', 'max-w-md',
+			'transform', 'scale-95', 'opacity-0',
+			'transition-all', 'duration-300'
 		);
 
 		this.render();
 	}
 
 	render() {
-		// Dialog content structure
+		// Simplified dialog content
 		this.dialogContainer.innerHTML = `
-            <button id="dialogCloseBtn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
-                ✕
-            </button>
-
             <div class="flex flex-col items-center text-center">
                 <h2 class="text-xl font-bold mb-4 ${this.getTitleColor()}">
                     ${this.options.title}
                 </h2>
                 
-                <p class="text-gray-700 mb-6">${this.options.message}</p>
+                <p class="text-gray-700 mb-4">${this.options.message}</p>
                 
-                <div class="flex gap-4">
-                    ${this.getConfirmButton()}
-                    ${this.options.showCancel ? this.getCancelButton() : ''}
-                </div>
+                <div class="w-12 h-12 border-4 border-t-4 
+                    ${this.getLoaderColor()} 
+                    border-t-transparent rounded-full 
+                    animate-spin"></div>
             </div>
         `;
 
 		this.dialogOverlay.appendChild(this.dialogContainer);
-
-		// Event Listeners
-		this.setupEventListeners();
 	}
-
 
 	getTitleColor() {
 		const colors = {
@@ -72,61 +62,46 @@ class Dialog {
 		return colors[this.options.type];
 	}
 
-	getConfirmButton() {
-		const buttonColors = {
-			info: 'bg-blue-500 hover:bg-blue-600',
-			success: 'bg-green-500 hover:bg-green-600',
-			error: 'bg-red-500 hover:bg-red-600',
-			warning: 'bg-yellow-500 hover:bg-yellow-600'
+	getLoaderColor() {
+		const colors = {
+			info: 'border-blue-600',
+			success: 'border-green-600',
+			error: 'border-red-600',
+			warning: 'border-yellow-600'
 		};
-
-		return `
-            <button id="dialogConfirmBtn" class="
-                px-6 py-2 rounded-md text-white 
-                ${buttonColors[this.options.type]}
-            ">
-                ${this.options.confirmText}
-            </button>
-        `;
-	}
-
-	getCancelButton() {
-		return `
-            <button id="dialogCancelBtn" class="
-                px-6 py-2 rounded-md text-gray-700 
-                bg-gray-200 hover:bg-gray-300
-            ">
-                ${this.options.cancelText}
-            </button>
-        `;
-	}
-
-	setupEventListeners() {
-		const confirmBtn = this.dialogContainer.querySelector('#dialogConfirmBtn');
-		const cancelBtn = this.dialogContainer.querySelector('#dialogCancelBtn');
-		const closeBtn = this.dialogContainer.querySelector('#dialogCloseBtn');
-
-		confirmBtn.addEventListener('click', () => {
-			this.options.onConfirm();
-			this.close();
-		});
-
-		if (cancelBtn) {
-			cancelBtn.addEventListener('click', () => {
-				this.options.onCancel();
-				this.close();
-			});
-		}
-
-		closeBtn.addEventListener('click', () => this.close());
+		return colors[this.options.type];
 	}
 
 	open() {
 		document.body.appendChild(this.dialogOverlay);
+
+		// Trigger reflow to enable transitions
+		void this.dialogOverlay.offsetWidth;
+
+		// Animate in
+		this.dialogOverlay.classList.remove('opacity-0');
+		this.dialogContainer.classList.remove('scale-95', 'opacity-0');
+
+		// Auto-close
+		if (this.options.duration > 0) {
+			this.closeTimer = setTimeout(() => this.close(), this.options.duration);
+		}
 	}
 
 	close() {
-		document.body.removeChild(this.dialogOverlay);
+		// Clear any existing timer
+		if (this.closeTimer) {
+			clearTimeout(this.closeTimer);
+		}
+
+		// Animate out
+		this.dialogOverlay.classList.add('opacity-0');
+		this.dialogContainer.classList.add('scale-95', 'opacity-0');
+
+		// Remove after transition
+		setTimeout(() => {
+			document.body.removeChild(this.dialogOverlay);
+		}, 300);
 	}
 
 	// Static method to show quick dialogs
@@ -136,4 +111,5 @@ class Dialog {
 		return dialog;
 	}
 }
+
 export default Dialog;
