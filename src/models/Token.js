@@ -30,7 +30,7 @@ tokenSchema.statics.generateToken = async function(data = {}, length = 8) {
 			hashed
 		});
 		if (!token) return { success: false, message: "Error creating Token", plain: null, hashed: null };
-		return { success: true, message: "Token created successfully", plain, hashed };
+		return { success: true, message: "Token created successfully", plain, hashed: token.hashed };
 	} catch (error) {
 		console.error('Error generating Token ', error);
 		return { success: false, message: "Internal Error Occurred", plain: null, hashed: null };
