@@ -48,7 +48,8 @@ tokenSchema.statics.verifyEmailVerificationToken = async function(token = ''.tri
 			return {
 				status: 400,
 				success: false,
-				message: 'Verification token is required'
+				message: 'Verification token is required',
+				email: null
 			};
 		}
 
@@ -64,17 +65,8 @@ tokenSchema.statics.verifyEmailVerificationToken = async function(token = ''.tri
 			return {
 				status: 404,
 				success: false,
-				message: 'Invalid or expired verification token'
-			};
-		}
-
-		// Find associated user
-		const user = await this.model('User').findOne({ email: isToken.email });
-		if (!user) {
-			return {
-				status: 404,
-				success: false,
-				message: 'User not found'
+				message: 'Invalid or expired verification token',
+				email: null
 			};
 		}
 
@@ -82,21 +74,21 @@ tokenSchema.statics.verifyEmailVerificationToken = async function(token = ''.tri
 		isToken.isUsed = true;
 		await isToken.save();
 
-		// Update user verification status
-		user.isVerified = true;
-		await user.save();
 
 		return {
 			status: 200,
 			success: true,
 			message: 'Email verified successfully',
+			email: isToken.email
 		};
 
 	} catch (error) {
+		console.error('Error verifying email token', error)
 		return {
 			status: 500,
 			success: false,
 			message: 'Error verifying email',
+			email: null
 		};
 	}
 };

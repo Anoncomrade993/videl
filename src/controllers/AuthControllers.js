@@ -666,7 +666,7 @@ const successTemplate = (redirectUrl = '/signin') => `
 </html>
 `;
 
-const errorTemplate = (redirectUrl = '/signin') => `
+const errorTemplate = (message = '', redirectUrl = '/signin') => `
 <!DOCTYPE html>
 <html lang="en">
 
@@ -690,7 +690,7 @@ const errorTemplate = (redirectUrl = '/signin') => `
 				<i data-lucide="x-circle"></i>
 			</div>
 			<h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4">Something Went Wrong</h1>
-			<p class="text-gray-700 mb-6">An error occurred while verifying your email. Please try again later.</p>
+			<p class="text-gray-700 mb-6">${message}</p>
 			<a href="${redirectUrl}" class="inline-block px-6 py-3 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-200">Go to Sign In</a>
 		</div>
 	</div>
@@ -709,25 +709,32 @@ module.exports.emailVerification = async (req, res) => {
 		const csrf = req.query.kaf?.trim();
 
 		if (!token || !csrf) {
-			return res.status(400).send(errorTemplate());
+			return res.status(400).send(errorTemplate("Token or CSRF is missing."));
 		}
 
 		const tempSess = await TempSession.findOne({ state: csrf });
 		if (!tempSess) {
-			return res.status(403).send(errorTemplate());
+			return res.status(403).send(errorTemplate("Invalid CSRF token."));
 		}
 
 		await TempSession.deleteOne({ state: csrf });
 
-		const { status, success, message } = await Token.verifyEmailVerificationToken(token);
-
+		const { status, success, message, email } = await Token.verifyEmailVerificationToken(token);
 		if (!success) {
-			return res.status(status).send(errorTemplate());
+			return res.status(status).send(errorTemplate(message || "Token verification failed."));
 		}
+
+		const userUpdateResult = await User.findOneAndUpdate({ email }, { $set: { isVerified: true } }, { new: true });
+
+		if (!userUpdateResult) {
+			return res.status(404).send(errorTemplate("User not found."));
+		}
+
+		console.log(`User verified: ${email}`);
 		return res.status(200).send(successTemplate());
 
 	} catch (error) {
-		console.error('Error verifying user email', error);
-		return res.status(500).send(errorTemplate());
+		console.error('Error verifying user email:', error);
+		return res.status(500).send(errorTemplate("Internal server error."));
 	}
 };
