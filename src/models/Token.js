@@ -54,7 +54,7 @@ tokenSchema.statics.verifyEmailVerificationToken = async function(token = ''.tri
 		}
 
 
-		const isToken = await Token.findOne({
+		const isToken = await this.findOne({
 			isUsed: false,
 			hashed: token,
 			purpose: 'VerifyEmail'
