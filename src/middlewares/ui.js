@@ -20,7 +20,7 @@ async function requireAuthUI(req, res, next) {
 		}
 
 		if (!isVerified) {
-			return res.status(302).redirect('/email-verification');
+			return res.status(302).redirect('/verification');
 		}
 
 		next();

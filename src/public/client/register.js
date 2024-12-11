@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const submitBtn = document.getElementById('submit');
 
 	form.addEventListener('submit', async (event) => {
-		event.preventDefault(); // Prevent default form submission
+		event.preventDefault(); 
 		clearErrors();
 
 		const username = form.username.value.trim();
@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (response.ok) {
 				form.reset();
 				window.localStorage.setItem('uemail', JSON.stringify({ email }));
-				showRegistrationDialog(true); // Show success dialog
+				showRegistrationDialog(true);
 				setTimeout(() => {
-					window.location.href = '/verification'; // Example redirect
+					window.location.href = '/verification';
 				}, 2000);
 			} else {
 				// Handle error response
