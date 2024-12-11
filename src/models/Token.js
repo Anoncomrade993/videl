@@ -40,7 +40,7 @@ tokenSchema.statics.generateToken = async function(data = {}, length = 8) {
 
 // as the name states 🥲
 // DO NOT TOUCH 
-tokenSchema.statics.verifyEmailVerificationToken = async function(token = ''.trim()) {
+tokenSchema.statics.verifyEmailVerificationToken = async function(token) {
 	try {
 
 
@@ -57,7 +57,7 @@ tokenSchema.statics.verifyEmailVerificationToken = async function(token = ''.tri
 		const isToken = await this.findOne({
 			isUsed: false,
 			hashed: token,
-			purpose: 'VerifyEmail'
+			purpose: 'verifyEmail'
 		});
 
 
