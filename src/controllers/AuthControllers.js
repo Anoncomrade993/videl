@@ -3,7 +3,7 @@ const Token = require('../models/Token.js')
 const User = require('../models/User.js')
 const Schedule = require('../models/Schedule.js')
 const Scrypt = require('../services/Scrypt.js')
-
+const crypto = require('crypto')
 const { sendJsonResponse, } = require('../utility/helpers.js')
 const { EMAIL_REGEX } = require('../constants.js')
 const {
