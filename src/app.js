@@ -88,7 +88,7 @@
  app.use(cookie());
  app.use(rateLimiter);
  app.use(bodyParser.json());
- app.use(bodyParser.urlencoded({ extended: false }));
+ app.use(bodyParser.urlencoded({ extended: true }));
  app.use(attackMiddleware);
  app.disable("x-powered-by");
 
