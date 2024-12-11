@@ -62,7 +62,7 @@ module.exports.registerUser = async function(req, res) {
 		await saveSession(req);
 
 		// Send verification email
-		await sendVerifyEmail(user.email, { username, token: plain });
+		await sendVerifyEmail(user.email, { username, verificationLink: `${process.env.BASE_URL}/auth/verify-email/${encodeURIComponent(plain)}` });
 
 		return sendJsonResponse(res, 201, true, 'User created successfully. Please verify your email.')
 	} catch (error) {
@@ -648,9 +648,9 @@ module.exports.checkUsername = async function(req, res) {
 
 module.exports.emailVerification = async function(req, res) {
 	try {
-		const { token } = req.params;
+		const token = req.params.token.trim();
 
-		if (!token.trim()) {
+		if (!token) {
 			return res.status(400).send(`
                 <!DOCTYPE html>
                 <html>
@@ -707,8 +707,8 @@ module.exports.emailVerification = async function(req, res) {
                 </html>
             `);
 		}
-
-		const { status, success, message } = await Token.verifyEmailVerificationToken(token);
+		const decodedToken = decodeURIComponent(token)
+		const { status, success, message } = await Token.verifyEmailVerificationToken(decodedToken);
 		if (!success) {
 			return res.status(status).send(`
                 <!DOCTYPE html>
