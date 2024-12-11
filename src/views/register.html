@@ -27,7 +27,7 @@
 	<div class="pt-16 sm:pt-24 bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
 		<div class="max-w-md w-full mx-auto bg-white rounded-xl shadow-2xl overflow-hidden p-6 sm:p-8">
 			<h2 class="text-2xl sm:text-3xl font-extrabold text-center text-gray-900 mb-4 sm:mb-6">Create Your Account</h2>
-			<form class="space-y-4 sm:space-y-6" id="registration-form">
+			<form method="POST" action="/auth/register" class="space-y-4 sm:space-y-6" id="registration-form">
 				<div>
 					<label for="username" class="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Username</label>
 					<div class="relative">
@@ -97,14 +97,12 @@
 	</div>
 
 	<script type="module">
-		import Dialog from '../utils/Dialog.js';
-
+	
 		document.addEventListener('DOMContentLoaded', () => {
 			const form = document.getElementById('registration-form');
 			const submitBtn = document.getElementById('submit');
 
 			form.addEventListener('submit', async (event) => {
-				event.preventDefault(); // Prevent default form submission
 				clearErrors();
 
 				const username = form.username.value.trim();
@@ -121,36 +119,7 @@
 				submitBtn.disabled = true;
 				submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
-				try {
-					const response = await fetch('/auth/register', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ username, email, password }),
-					});
 
-					const result = await response.json();
-					if (!response.ok) throw new Error(result.message || 'Registration failed');
-
-					Dialog.show({
-						title: 'Registration Successful',
-						message: 'Your account has been created!',
-						type: 'success',
-						onConfirm: () => {
-							form.reset();
-							window.localStorage.setItem('uemail', JSON.stringify({ email }));
-							window.location.href = '/verification';
-						}
-					});
-				} catch (error) {
-					Dialog.show({
-						title: 'Registration Error',
-						message: error.message || 'An unexpected error occurred',
-						type: 'error'
-					});
-				} finally {
-					submitBtn.disabled = false;
-					submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-				}
 			});
 
 			function validateForm(username, email, password, confirmPassword) {
@@ -193,9 +162,9 @@
 		});
 	</script>
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-<!--	<script>
+	<script>
 		lucide.createIcons();
-	</script>-->
+	</script>
 </body>
 
 </html>
