@@ -41,7 +41,7 @@ module.exports.registerUser = async function(req, res) {
 		if (!success) return sendJsonResponse(res, 500, false, message)
 
 		// Generate verification token
-		const { success: created, message:_, plain, hashed } = await Token.generateToken({
+		const { success: created, message: _, plain, hashed } = await Token.generateToken({
 			email,
 			purpose: 'verifyEmail'
 		}, 16);
@@ -330,11 +330,15 @@ module.exports.request_ev_OTP = async function(req, res) {
 		if (!isUser) {
 			return sendJsonResponse(res, 404, false, 'User not found')
 		}
-		const { success, message: _, plain } = await Token.generateToken({ email, purpose: 'verifyEmail' });
+		const { success, message: _, plain, hashed } = await Token.generateToken({ email, purpose: 'verifyEmail' });
 		if (!success) {
 			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
 		}
-		await sendVerifyEmail(isUser.email, { username: isUser.username, token: plain });
+		const state = crypto.randomBytes(16).toString('hex');
+		await TempSession.create({ state });
+
+		// Send verification email
+		await sendVerifyEmail(isUser.email, { username: isUser.username, verificationLink: `${process.env.BASE_URL}/verify-email/${hashed}/?kaf=${state}` });
 		return sendJsonResponse(res, 201, true, 'check email for token')
 	} catch (error) {
 		console.error('Error generating email verification token ', error)
