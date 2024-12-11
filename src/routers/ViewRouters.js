@@ -4,7 +4,7 @@ const { logAuditAction } = require('../middlewares/audit.js')
 const uiRouter = express.Router();
 
 uiRouter.get('/', (req, res) => {
-	if (req.session?.user) {
+	if (req.session?.user && req.session?.user.isVerified) {
 		return res.send(`
             <!DOCTYPE html>
             <html>
@@ -32,7 +32,9 @@ uiRouter.get('/dashboard', requireAuthUI, async function(req, res) {
 		const user = req.session?.user;
 
 		if (!user || !user.isVerified) {
-			return res.render('401.html')
+			const error = new Error('User not authenticated')
+			error.status = 401;
+			throw error
 		}
 		const { username, avatar, isAuthWithGitSigned = false } = user
 		return res.render('dashboard.html', { username, avatar, isAuthWithGithub })
@@ -43,7 +45,7 @@ uiRouter.get('/dashboard', requireAuthUI, async function(req, res) {
 });
 
 uiRouter.get('/change-password', requireAuthUI, renderView('change-password.html'));
-uiRouter.get('/verification', requireAuthUI, renderView('verification.html'));
+uiRouter.get('/verification', renderView('verification.html'));
 
 /*
 uiRouter.get('/cancel-delete-schedule', renderView('cancel-delete-schedule.html'));

@@ -101,7 +101,8 @@ module.exports.requireAuth = function(req, res, next) {
 		}
 	} catch (error) {
 		console.error("Error validating user", error);
-		return res.status(500).json({ message: "Internal Server Error Occurred" });
+		//return res.status(500).json({ message: "Internal Server Error Occurred" });
+		next(error)
 	}
 }
 
