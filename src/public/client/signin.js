@@ -1,120 +1,123 @@
-import Dialog from './Dialog'
-
-
+import Dialog from '../utils/Dialog';
 
 document.addEventListener('DOMContentLoaded', () => {
-	const form = document.querySelector('form');
-	const passwordInput = document.querySelector('input[name="password"]');
-	const emailInput = document.querySelector('input[name="email"]');
 
-	form.addEventListener('submit', async function(event) {
-		event.preventDefault();
+	const dlog = new Dialog();
 
-		// Clear any previous error messages
+	const submitBtn = document.getElementById('submit');
+	const emailElement = document.getElementById('email');
+	const passwordElement = document.getElementById('password');
+
+	submitBtn.addEventListener('click', async (event) => {
 		clearErrors();
 
-		// Validation checks
-		const validations = [
-			{ input: emailInput, validator: validateEmail, errorMessage: 'Invalid email format' },
-			{ input: passwordInput, validator: validatePassword, errorMessage: 'Password must be at least 8 characters' },
-        ];
+		const email = emailElement.value.trim();
+		const password = passwordElement.value.trim();
 
-		// Perform validations
-		const errors = validations.filter(({ input, validator }) =>
-			!validator(input.value.trim())
-		);
+		const errors = validateForm(emailElement, email);
 
+		console.log(errors);
 
-		// If there are validation errors, display them and stop submission
 		if (errors.length > 0) {
-			// Use Dialog for validation errors
-			Dialog.show({
-				title: 'Validation Error',
-				message: errors[0].errorMessage || 'Please check your input',
-				type: 'error'
-			});
-
-			// Also highlight specific inputs
-			errors.forEach(({ input, errorMessage }) => {
-				displayError(input, errorMessage);
-			});
+			errors.forEach(error => displayError(error.input, error.message));
 			return;
 		}
 
-		try {
-			// Prepare data for submission
-			const userData = {
-				email: emailInput.value.trim(),
-				password: passwordInput.value.trim(),
-			};
+		submitBtn.disabled = true;
+		submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
-			// Send registration request
+		try {
 			const response = await fetch('/auth/signin', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				credentials: 'include',
-				body: JSON.stringify(userData)
+				body: JSON.stringify({
+					email,
+					password,
+				})
 			});
 
-			// Parse response
-			const result = await response.json();
-
-			// Handle different response statuses
 			if (response.ok) {
 				// Successful registration
-				Dialog.show({
-					title: 'Successful Login',
-					message: 'user logged in!',
-					type: 'success',
-					onConfirm: () => {
-						form.reset();
-						window.location.href = '/dashboard'
-					}
-				});
-			} else {
-				// Server returned an error
-				throw new Error(result.message || 'Registration failed');
-			}
+				let uemail = window.localStorage.getItem('uemail')
+				if (uemail) window.localStorage.clear()
 
+				dlog.success('Login', 'Signed in successfully')
+				setTimeout(() => {
+					window.location.href = '/dashboard';
+				}, 2000);
+			} else {
+				let errorMessage = 'Something went wrong';
+				try {
+					const errorData = await response.json();
+					errorMessage = errorData.message ||
+						`Error ${response.status}: ${response.statusText}`;
+				} catch (parseError) {
+					errorMessage = `Error ${response.status}: ${response.statusText}`;
+				}
+
+				dlog.error('Login failed', errorMessage);
+			}
 		} catch (error) {
-			// Display user-friendly error dialog
-			Dialog.show({
-				title: 'Registration Error',
-				message: error.message || 'An unexpected error occurred',
-				type: 'error'
-			});
+			console.error('Login error:', error);
+			dlog.error('Network error', 'Please try again.');
+		} finally {
+			submitBtn.disabled = false;
+			submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
 		}
 	});
 
-	// Validation helper functions
+
+	function validateForm(
+		emailElement,
+		email
+	) {
+		const errors = [];
+
+
+		// Email validation
+		if (!validateEmail(email)) {
+			errors.push({
+				input: emailElement,
+				message: 'Invalid email format'
+			});
+		}
+
+
+		return errors;
+	}
+
+
 	function validateEmail(email) {
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		return emailRegex.test(email);
 	}
 
-	function validatePassword(password) {
-		return password.length >= 8;
-	}
 
-
-	// Error display functions
 	function displayError(input, message) {
-		// Create or update error element
 		let errorElement = input.nextElementSibling;
+
 		if (!errorElement || !errorElement.classList.contains('error-message')) {
 			errorElement = document.createElement('div');
-			errorElement.classList.add('error-message');
+			errorElement.classList.add(
+				'error-message',
+				'text-red-500',
+				'text-xs',
+				'mt-1'
+			);
 			input.parentNode.insertBefore(errorElement, input.nextSibling);
 		}
 
 		errorElement.textContent = message;
-		input.classList.add('error');
+		input.classList.add('border-red-500');
 	}
+
+
 
 	function clearErrors() {
 		document.querySelectorAll('.error-message').forEach(el => el.remove());
-		document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+		document.querySelectorAll('.border-red-500')
+			.forEach(el => el.classList.remove('border-red-500'));
 	}
 });

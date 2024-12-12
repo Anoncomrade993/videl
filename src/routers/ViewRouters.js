@@ -10,7 +10,7 @@ uiRouter.get('/', (req, res) => {
             <html>
             <head>
             <meta http-equiv="refresh" content="3;url=/dashboard">
-            <title>...</title></head>
+            <title>redirecting...</title></head>
             <body></body>
   </html> `);
 	}

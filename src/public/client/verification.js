@@ -1,40 +1,55 @@
-import Dialog from './Dialog'
-
+import Dialog from '../utils/Dialog';
 
 
 document.addEventListener('DOMContentLoaded', () => {
-	// Countdown timer
+	const dlog = new Dialog();
+
+	// Get DOM elements
 	const countdownElement = document.getElementById('countdown');
 	const requestLink = document.getElementById('requestLink');
-	let countdownTime = 120; // 5 minutes in seconds
+	let countdownTime = 120; // 2 minutes in seconds
 
-	const countdown = setInterval(() => {
-		const minutes = Math.floor(countdownTime / 60);
-		const seconds = countdownTime % 60;
+	// Countdown timer function
+	const startCountdown = () => {
+		const countdownInterval = setInterval(() => {
+			const minutes = Math.floor(countdownTime / 60);
+			const seconds = countdownTime % 60;
 
-		countdownElement.textContent = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+			// Format countdown display
+			countdownElement.textContent = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
-		if (countdownTime <= 0) {
-			clearInterval(countdown);
-			countdownElement.textContent = 'Time is up! You can now request a new verification link.';
-			requestLink.classList.remove('disabled:opacity-50');
-			requestLink.onclick = () => handler()
-		}
-		countdownTime--;
-	}, 1000);
-	
-	
-	
+			if (countdownTime <= 0) {
+				clearInterval(countdownInterval);
+				countdownElement.textContent = 'Time is up! You can now request a new verification link.';
+
+				// Enable request link
+				requestLink.classList.remove('disabled:opacity-50');
+				requestLink.disabled = false;
+				requestLink.onclick = handler;
+			}
+
+			countdownTime--;
+		}, 1000);
+	};
+
+	// Handler for requesting verification link
 	async function handler() {
 		try {
-			// Prepare data for submission
+			// Retrieve email from localStorage
 			const email = window.localStorage.getItem('uemail');
 			if (!email) {
+				dlog.error('Email Error', 'Email not found. Please try again.');
 				return;
 			}
+
+			// Disable request link during request
+			requestLink.disabled = true;
+			requestLink.classList.add('disabled:opacity-50');
+
+			// Prepare request data
 			const userData = { email: email.trim() };
 
-			// Send registration request
+			// Send verification request
 			const response = await fetch('/auth/request-ev-otp', {
 				method: 'POST',
 				headers: {
@@ -47,31 +62,30 @@ document.addEventListener('DOMContentLoaded', () => {
 			// Parse response
 			const result = await response.json();
 
-			// Handle different response statuses
+			// Handle response
 			if (response.ok) {
-				// Successful registration
-				Dialog.show({
-					title: 'Email verification',
-					message: 'token sent to email!',
-					type: 'success',
-					onConfirm: () => {
-						form.reset();
-						localStorage.clear();
-						window.location.href = '/login'
-					}
-				});
-			} else {
-				// Server returned an error
-				throw new Error(result.message || 'Registration failed');
-			}
+				dlog.success('Verification Sent', 'Verification token sent to your email');
 
+				// Reset countdown
+				countdownTime = 120;
+				startCountdown();
+			} else {
+				dlog.error('Verification request error', result.message || 'Failed to send verification token');
+				// Log error
+				console.error('Verification request error:', result);
+			}
 		} catch (error) {
-			// Display user-friendly error dialog
-			Dialog.show({
-				title: 'Registration Error',
-				message: error.message || 'An unexpected error occurred',
-				type: 'error'
-			});
+			// Network or unexpected error
+			dlog.error('Network Error', 'Please check your connectivity');
+			console.error('Request error:', error);
+		} finally {
+			// Re-enable request link
+			requestLink.disabled = false;
+			requestLink.classList.remove('disabled:opacity-50');
 		}
-	};
+	}
+
+	// Initial setup
+	requestLink.onclick = handler;
+	startCountdown();
 });

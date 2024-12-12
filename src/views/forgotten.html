@@ -4,12 +4,16 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Forgot Password - Videl </title>
-	<link rel="stylesheet" href="/styles.css">
-	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+	<!-- Favicon -->
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<!-- Fallback favicons  -->
+	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
+	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
+	<title>Forgot Password - Videl</title>
+	<script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-white min-h-screen">
+<body class="bg-white min-h-screen overflow-x-hidden">
 	<!-- Toast Notification System -->
 	<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
@@ -17,26 +21,26 @@
 	<nav class="fixed w-full z-20 top-0 left-0 border-b border-gray-200 bg-white/90 backdrop-blur-md">
 		<div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
 			<a href="#" class="flex items-center space-x-3">
-				<span class="self-center text-2xl font-semibold whitespace-nowrap text-orange-600">Videl</span>
+				<span class="self-center text-xl sm:text-2xl font-semibold whitespace-nowrap text-orange-600 logo-text">Videl</span>
 			</a>
 		</div>
 	</nav>
 
 	<!-- Forgot Password Section -->
-	<div class="pt-24 bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center">
-		<div class="max-w-md w-full mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
-			<div class="p-8">
-				<div class="mb-6 flex justify-center">
-					<i data-lucide="key" class="w-16 h-16 text-orange-600"></i>
+	<div class="pt-16 sm:pt-24 bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
+		<div class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden forgot-password-card">
+			<div class="p-6 sm:p-8 md:p-10">
+				<div class="mb-4 sm:mb-6 flex justify-center">
+					<i data-lucide="key" class="w-10 sm:w-12 h-10 sm:h-12 text-orange-600"></i>
 				</div>
-				<h2 class="text-3xl font-extrabold text-center text-gray-900 mb-4">
+				<h2 class="text-2xl sm:text-3xl font-extrabold text-center text-gray-900 mb-3 sm:mb-4 heading">
 					Forgot Password
 				</h2>
-				<p id="stage-description" class="text-gray-600 text-center mb-6">
+				<p id="stage-description" class="text-gray-600 text-center mb-4 sm:mb-6 text-sm sm:text-base">
 					Enter your email to reset your password
 				</p>
 
-				<form id="forgot-password-form" class="space-y-6 sm:space-y-6">
+				<div id="forgot-password-form" class="space-y-4 sm:space-y-6">
 					<!-- Email Input Section -->
 					<div id="email-section">
 						<label for="email" class="block text-sm font-medium text-gray-700 mb-2">
@@ -44,319 +48,40 @@
 						</label>
 						<div class="relative">
 							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-								<i data-lucide="mail" class="w-5 h-5 text-gray-400"></i>
+								<i data-lucide="mail" class="w-4 sm:w-5 h-4 sm:h-5 text-gray-400 input-icon"></i>
 							</div>
-							<input type="email" id="email" required class="pl-10 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="you@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+							<input type="email" id="email" required class="input-field pl-10 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="you@example.com" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
 						</div>
 						<p id="email-error" class="text-red-500 text-sm mt-2 hidden"></p>
 					</div>
 
-					<!-- Token Section (Hidden by default) -->
-					<div id="token-section" class="hidden space-y-6">
-						<div>
-							<label for="token" class="block text-sm font-medium text-gray-700 mb-2">
-								Verification Token
-							</label>
-							<div class="relative">
-								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-									<i data-lucide="key" class="w-5 h-5 text-gray-400"></i>
-								</div>
-								<input type="text" id="token" maxlength="6" required class="pl-10 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Enter 6-digit code" pattern="\d{6}" inputmode="numeric">
-							</div>
-							<p id="token-error" class="text-red-500 text-sm mt-2 text-center hidden"></p>
-						</div>
-					</div>
-
-					<!-- New Password Section (Hidden by default) -->
-					<div id="new-password-section" class="hidden space-y-6">
-						<div>
-							<label for="new-password" class="block text-sm font-medium text-gray-700 mb-2">
-								New Password
-							</label>
-							<div class="relative">
-								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-									<i data-lucide="lock" class="w-5 h-5 text-gray-400"></i>
-								</div>
-								<input type="password" id="new-password" required class="pl-10 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Enter new password">
-							</div>
-							<p id="new-password-error" class="text-red-500 text-sm mt-2 hidden"></p>
-						</div>
-						<div>
-							<label for="confirm-new-password" class="block text-sm font-medium text-gray-700 mb-2">
-								Confirm New Password
-							</label>
-							<div class="relative">
-								<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-									<i data-lucide="check-circle" class="w-5 h-5 text-gray-400"></i>
-								</div>
-								<input type="password" id="confirm-new-password" required class="pl-10 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500" placeholder="Confirm new password">
-							</div>
-							<p id="confirm-password-error" class="text-red-500 text-sm mt-2 hidden"></p>
-						</div>
-					</div>
-
 					<!-- Submission Button -->
 					<div>
-						<button id="submit-btn" type="submit" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
-							Send Verification Code
+						<button id="submit-btn" type="button" class="w-full flex justify-center py-2.5 sm:py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-300">
+							Proceed
 						</button>
 					</div>
 
 					<!-- Resend Code Section -->
-					<div id="resend-section" class="text-center hidden">
-						<p class="text-sm text-gray-600">
-							Didn't receive the code?
-							<a href="#" id="resend-link" class="font-medium text-gray-400 cursor-not-allowed">
-								Resend Code
+					<div id="resend-section" class="text-center ">
+						<p class="text-xs sm:text-sm text-gray-600">
+							Didn't receive the token?
+							<a href="javascript:void(0)" id="resend-link" class="font-medium text-blue-400 cursor-not-allowed hover:text-gray-500 transition-colors">
+								Get a fresh token
 							</a>
-							<span id="countdown" class="ml-2 text-gray-500"></span>
+							<span id="countdown" class="ml-2 text-gray-800"></span>
 						</p>
 					</div>
-				</form>
+				</div>
 			</div>
 		</div>
 	</div>
 
+	<script type="module" src="/client/reset_password.js"></script>
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<script>
-		// Initialize Lucide icons
 		lucide.createIcons();
-
-		// Utility Functions (same as before)
-		const showToast = (message, type = 'info') => {
-			const toastContainer = document.getElementById('toast-container');
-			const toast = document.createElement('div');
-
-			const typeStyles = {
-				'success': 'bg-green-500',
-				'error': 'bg-red-500',
-				'info': 'bg-blue-500',
-				'warning': 'bg-yellow-500'
-			};
-
-			toast.className = `${typeStyles[type]} text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform`;
-			toast.textContent = message;
-
-			toastContainer.appendChild(toast);
-
-			// Remove toast after 3 seconds
-			setTimeout(() => {
-				toast.classList.add('-translate-x-full', 'opacity-0');
-				setTimeout(() => toastContainer.removeChild(toast), 300);
-			}, 3000);
-		};
-
-		const validateEmail = (email) => {
-			const regex = /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i;
-			return regex.test(email);
-		};
-
-		const validatePassword = (password) => {
-			const errors = [];
-			if (password.length < 8) errors.push('Password must be at least 8 characters');
-			if (!/[A-Z]/.test(password)) errors.push('Must include an uppercase letter');
-			if (!/[a-z]/.test(password)) errors.push('Must include a lowercase letter');
-			if (!/[0-9]/.test(password)) errors.push('Must include a number');
-			if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) errors.push('Must include a special character');
-			return errors;
-		};
-
-		// DOM Elements
-		const form = document.getElementById('forgot-password-form');
-		const emailSection = document.getElementById('email-section');
-		const tokenSection = document.getElementById('token-section');
-		const newPasswordSection = document.getElementById('new-password-section');
-		const submitBtn = document.getElementById('submit-btn');
-		const resendSection = document.getElementById('resend-section');
-		const resendLink = document.getElementById('resend-link');
-		const countdownSpan = document.getElementById('countdown');
-		const stageDescription = document.getElementById('stage-description');
-
-		const tokenInput = document.getElementById('token');
-		let stage = 0; // 0: email, 1: token, 2: new password
-		let resendTimer = null;
-		let userEmail = ''; // Store email across stages
-
-		// Token Input Handling
-		tokenInput.addEventListener('input', (e) => {
-			e.target.value = e.target.value.replace(/[^0-9]/g, '');
-		});
-
-		form.addEventListener('submit', (e) => {
-			e.preventDefault();
-
-			// Reset previous error states
-			document.querySelectorAll('.text-red-500').forEach(el => el.classList.add('hidden'));
-
-			if (stage === 0) {
-				// Email stage
-				const emailInput = document.getElementById('email');
-				const emailError = document.getElementById('email-error');
-
-				if (!validateEmail(emailInput.value)) {
-					emailError.textContent = 'Please enter a valid email address';
-					emailError.classList.remove('hidden');
-					return;
-				}
-
-				userEmail = emailInput.value;
-
-				// Simulate sending token (replace with actual API call)
-				showToast('Verification code sent', 'success');
-				const res = await fetch('/api/v1/auth/reset-password',{
-					 
-				})
-				emailSection.classList.add('hidden');
-				tokenSection.classList.remove('hidden');
-				submitBtn.textContent = 'Verify Code';
-				stageDescription.textContent = 'Enter the 6-digit verification code';
-				stage = 1;
-
-				startResendCountdown();
-			} else if (stage === 1) {
-				// Token stage
-				const tokenError = document.getElementById('token-error');
-
-				if (tokenInput.value.length !== 6 || !/^\d{6}$/.test(tokenInput.value)) {
-					tokenError.textContent = 'Please enter a valid 6-digit code';
-					tokenError.classList.remove('hidden');
-					return;
-				}
-
-				// Simulate token verification (replace with actual API call)
-				showToast('Code verified successfully', 'success');
-
-				tokenSection.classList.add('hidden');
-				newPasswordSection.classList.remove('hidden');
-				submitBtn.textContent = 'Reset Password';
-				stageDescription.textContent = 'Create a new password';
-				stage = 2;
-			} else if (stage === 2) {
-				// New password stage
-				const newPasswordInput = document.getElementById('new-password');
-				const confirmPasswordInput = document.getElementById('confirm-new-password');
-				const newPasswordError = document.getElementById('new-password-error');
-				const confirmPasswordError = document.getElementById('confirm-password-error');
-
-				const passwordErrors = validatePassword(newPasswordInput.value);
-
-				if (passwordErrors.length > 0) {
-					newPasswordError.textContent = passwordErrors.join('. ');
-					newPasswordError.classList.remove('hidden');
-					return;
-				}
-
-				if (newPasswordInput.value !== confirmPasswordInput.value) {
-					confirmPasswordError.textContent = 'Passwords do not match';
-					confirmPasswordError.classList.remove('hidden');
-					return;
-				}
-
-				// Simulate password reset (replace with actual API call)
-				showToast('Password reset successfully', 'success');
-
-				// Optional: Redirect to login or show success message
-				submitBtn.disabled = true;
-				submitBtn.textContent = 'Password Reset';
-			}
-		});
-
-		function startResendCountdown() {
-			resendSection.classList.remove('hidden');
-			resendLink.classList.add('text-gray-400', 'cursor-not-allowed');
-			resendLink.classList.remove('text-orange-600', 'hover:text-orange-500');
-
-			let timeLeft = 30;
-			countdownSpan.textContent = `(${timeLeft}s)`;
-
-			resendTimer = setInterval(() => {
-				timeLeft--;
-				countdownSpan.textContent = `(${timeLeft}s)`;
-
-				if (timeLeft <= 0) {
-					clearInterval(resendTimer);
-					resendLink.classList.remove('text-gray-400', 'cursor-not-allowed');
-					resendLink.classList.add('text-orange-600', 'hover:text-orange-500');
-					countdownSpan.textContent = '';
-				}
-			}, 1000);
-
-			resendLink.onclick = function(e) {
-				e.preventDefault();
-				if (timeLeft <= 0) {
-					// Simulate resending token (replace with actual API call)
-					showToast('New verification code sent', 'info');
-
-					// Reset token input
-					tokenInput.value = '';
-
-					// Restart countdown
-					startResendCountdown();
-				}
-			};
-		}
-
-		// Additional Accessibility and UX Improvements
-		document.addEventListener('DOMContentLoaded', () => {
-			// Auto-focus first input when section becomes visible
-			const observer = new MutationObserver((mutations) => {
-				mutations.forEach((mutation) => {
-					if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-						const emailInput = document.getElementById('email');
-						const tokenInput = document.getElementById('token');
-						const newPasswordInput = document.getElementById('new-password');
-
-						if (!emailSection.classList.contains('hidden')) {
-							emailInput.focus();
-						} else if (!tokenSection.classList.contains('hidden')) {
-							tokenInput.focus();
-						} else if (!newPasswordSection.classList.contains('hidden')) {
-							newPasswordInput.focus();
-						}
-					}
-				});
-			});
-
-			// Observe email, token, and new password sections
-			[emailSection, tokenSection, newPasswordSection].forEach(section => {
-				observer.observe(section, { attributes: true });
-			});
-		});
-
-		const togglePasswordVisibility = (passwordInput, toggleIcon) => {
-			const type = passwordInput.type === 'password' ? 'text' : 'password';
-			passwordInput.type = type;
-			toggleIcon.name = type === 'password' ? 'eye' : 'eye-off';
-		};
-
-		// Add password visibility toggle buttons
-		const newPasswordInput = document.getElementById('new-password');
-		const confirmPasswordInput = document.getElementById('confirm-new-password');
-
-		const newPasswordWrapper = newPasswordInput.parentElement;
-		const confirmPasswordWrapper = confirmPasswordInput.parentElement;
-
-		const createPasswordToggle = (wrapper, input) => {
-			const toggleButton = document.createElement('button');
-			toggleButton.type = 'button';
-			toggleButton.className = 'absolute inset-y-0 right-0 pr-3 flex items-center';
-
-			const toggleIcon = document.createElement('i');
-			toggleIcon.setAttribute('data-lucide', 'eye');
-			toggleIcon.className = 'w-5 h-5 text-gray-400';
-
-			toggleButton.appendChild(toggleIcon);
-			wrapper.appendChild(toggleButton);
-
-			toggleButton.addEventListener('click', () => {
-				togglePasswordVisibility(input, toggleIcon);
-			});
-
-			// Re-initialize Lucide icon
-			lucide.createIcons();
-		};
-
-		createPasswordToggle(newPasswordWrapper, newPasswordInput);
-		createPasswordToggle(confirmPasswordWrapper, confirmPasswordInput);
 	</script>
-	< /body>
-		< /html>
+</body>
+
+</html>

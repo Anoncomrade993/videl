@@ -1,61 +1,44 @@
-import Dialog from '../utils/Dialog.js'
+import Dialog from '../utils/Dialog'
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', () => {
+	const dlog = new Dialog();
 
-	const emailInput = document.getElementById('email').value.trim().toLowerCase()
-	const form = document.getElementById('newsletter')
 
-	// Validate email function
-	function validateEmail(email) {
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		return emailRegex.test(email);
-	}
+	const emailElement = document.getElementById('email');
+	const submitBtn = document.getElementById('submit');
 
-	form.addEventListener('submit', async function(event) {
-		 event.preventDefault();
-		// Disable submit button to prevent multiple submissions
-		const submitButton = form.querySelector('button[type="submit"]');
-		submitButton.disabled = true;
-		submitButton.classList.add('loading');
+	submitBtn.addEventListener('click', async function(event) {
+		const email = emailElement.value.trim()
 
+		if (!isValidEmail(email)) {
+			dlog.warning('Invalid Email', 'provide a valid email address')
+			return;
+		}
 		try {
-			// Validate email before submission
-			if (!validateEmail(emailInput)) {
-				throw new Error('Please enter a valid email address');
-			}
-
-			const req = await fetch('/subscribe', {
+			const response = await fetch('/susbcribe', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ email: emailInput })
+				body: JSON.stringify({ email })
 			});
 
-			const res = await req.json();
+			const result = await response.json();
 
-			if (!req.ok) {
-				throw new Error(res.message || 'An error occurred during subscription');
+			if (response.ok) {
+				dlog.success('Subscription', 'Email subscribed successfully');
+				return;
+			} else {
+				dlog.error('Subscription error', 'Something went wrong' || result.message)
 			}
-
-			// Success case
-			Dialog.show({
-				type: 'success',
-				title: 'Subscription Successful',
-				message: res.message || 'You have been successfully subscribed to our newsletter!'
-			});
-
 		} catch (error) {
-			// Error handling
-			Dialog.show({
-				type: 'error',
-				title: 'Subscription Error',
-				message: error.message
-			});
-		} finally {
-			// Re-enable submit button
-			submitButton.disabled = false;
-			submitButton.classList.remove('loading');
+			console.error('Network error', error)
+			dlog.error('Network error', 'Check your connectivity')
 		}
 	});
+
+	function isValidEmail(email = '') {
+		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+		return emailRegex.test(email.trim().toLowerCase())
+	}
 });

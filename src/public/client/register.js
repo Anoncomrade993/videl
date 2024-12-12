@@ -1,6 +1,10 @@
-import Dialog from '../utils/Dialog.js';
+import Dialog from '../utils/Dialog';
 
 document.addEventListener('DOMContentLoaded', () => {
+
+	const dlog = new Dialog();
+
+
 	const submitBtn = document.getElementById('submit');
 	const usernameElement = document.getElementById('username');
 	const emailElement = document.getElementById('email');
@@ -53,13 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (response.ok) {
 				// Successful registration
 				window.localStorage.setItem('uemail', JSON.stringify({ email }));
-				showRegistrationDialog(true);
+				dlog.success('Registration', 'user registered successfully');
 
 				setTimeout(() => {
 					window.location.href = '/verification';
 				}, 2000);
 			} else {
-				let errorMessage = 'Registration failed';
+				let errorMessage = 'Something went wrong';
 				try {
 					const errorData = await response.json();
 					errorMessage = errorData.message ||
@@ -67,12 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
 				} catch (parseError) {
 					errorMessage = `Error ${response.status}: ${response.statusText}`;
 				}
-
-				showRegistrationDialog(false, errorMessage);
+				dlog.error('Registration failed', errorMessage)
 			}
 		} catch (error) {
 			console.error('Registration error:', error);
-			showRegistrationDialog(false, 'Network error. Please try again.');
+			dlog.error('Network error', 'Please try again.');
 		} finally {
 			submitBtn.disabled = false;
 			submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
@@ -159,23 +162,4 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.querySelectorAll('.border-red-500')
 			.forEach(el => el.classList.remove('border-red-500'));
 	}
-
-
-	function showRegistrationDialog(success, customMessage) {
-		const dialogConfig = {
-			title: success ? 'Registration Successful' : 'Registration Failed',
-			message: success ?
-				'Your account has been created successfully!' : (customMessage || 'There was an error creating your account.'),
-			type: success ? 'success' : 'error',
-			confirmText: 'Continue',
-			onConfirm: () => {
-				if (success) {
-					console.log('Navigating to verification...');
-				}
-			}
-		};
-
-		Dialog.show(dialogConfig);
-		
-	}
-});
+})
