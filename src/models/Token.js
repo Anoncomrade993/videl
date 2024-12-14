@@ -15,7 +15,7 @@ const tokenSchema = new mongoose.Schema({
 
 tokenSchema.index({ createdAt: 1 }, { expiresAfterSeconds: 300 });
 
-tokenSchema.statics.generateToken = async function({ email, purpose }, length = 8, expirationDuration = 300000) {
+tokenSchema.statics.generateToken = async function({ email, purpose }, length = 16, expirationDuration = 300000) {
 	try {
 
 		await this.deleteMany({ email, isUsed: false, purpose });
@@ -41,22 +41,23 @@ tokenSchema.statics.generateToken = async function({ email, purpose }, length = 
 };
 
 tokenSchema.statics.generateShortLivedToken = async function(email, purpose, length = 8) {
-	return this.generateToken(email, purpose, length, 5 * 60 * 1000);
+	return await this.generateToken(email, purpose, length, 5 * 60 * 1000);
 };
 
 tokenSchema.statics.generateLongLivedToken = async function(email, purpose, length = 8) {
-	return this.generateToken(email, purpose, length, 14 * 24 * 60 * 60 * 1000);
+	return await this.generateToken(email, purpose, length, 14 * 24 * 60 * 60 * 1000);
 };
 
-tokenSchema.statics.verifyToken = async function(email, purpose) {
+tokenSchema.statics.verifyToken = async function(token, purpose) {
 	try {
-		if (!email || !purpose) {
+		if (!token || !purpose) {
 			return { success: false, status: 400, message: "Missing parameters" };
 		}
 
 		const tokenDoc = await this.findOne({
-			purpose,
-			isUsed: false
+			hashed: token,
+			isUsed: false,
+			purpose
 		});
 
 		if (!tokenDoc) {

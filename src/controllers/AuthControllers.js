@@ -41,10 +41,10 @@ module.exports.registerUser = async function(req, res) {
 		if (!success) return sendJsonResponse(res, 500, false, message)
 
 		// Generate verification token
-		const { success: created, message: _, plain, hashed } = await Token.generateToken({
+		const { success: created, message: _, plain, hashed } = await Token.generateShortLivedToken({
 			email,
 			purpose: 'verifyEmail'
-		}, 16);
+		});
 
 		if (!created) {
 			return sendJsonResponse(res, 500, false, 'Internal server error occurred ')
@@ -255,123 +255,6 @@ module.exports.forgotPassword = async function(req, res) {
 		return sendJsonResponse(res, 200, true, 'Password updated successfully');
 	} catch (error) {
 		console.error('Error updating password on forgotten password', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-	}
-}
-
-module.exports.request_cp_OTP = async function(req, res) {
-	try {
-		const user = req.session.user;
-
-		if (!user || Object.keys(user).length === 0) {
-			return sendJsonResponse(res, 401, false, 'You are not authenticated')
-		}
-		const isUser = await User.findOne({ _id: user.userId });
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'user not found')
-		}
-		if (isUser.onKillList) {
-			return sendJsonResponse(res, 403, true, 'user has been scheduled to be deleted', { onKillList: true })
-		}
-		const { success, message: _, plain } = await Token.generateToken({ email: isUser.email, purpose: 'changePassword' });
-		if (!success) {
-			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-		}
-		await sendChangePasswordEmail(isUser.email, { username: isUser.username, token: plain });
-		return sendJsonResponse(res, 201, true, 'check your email for token', { sent: true })
-	} catch (error) {
-		console.error('Error on request for change password token', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-	}
-}
-
-
-
-module.exports.request_ce_OTP = async function(req, res) {
-	try {
-		const user = req.session.user;
-
-		if (!user || Object.keys(user).length === 0) {
-			return sendJsonResponse(res, 401, false, 'You are not authenticated')
-		}
-		const isUser = await User.findOne({ _id: user.userId });
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'user not found')
-		}
-
-		if (isUser.onKillList) {
-			return sendJsonResponse(res, 403, true, 'user has been scheduled to be deleted', { onKillList: true })
-		}
-
-		const { success, message: _, plain } = await Token.generateToken({ email: isUser.email, purpose: 'changeEmail' });
-		if (!success) {
-			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-		}
-		await sendEmailChangeEmail(isUser.email, { username: isUser.username, token: plain });
-		return sendJsonResponse(res, 201, true, 'check your email for token', { sent: true })
-	} catch (error) {
-		console.error('Error on request for change email token', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-	}
-}
-
-
-
-module.exports.request_ev_OTP = async function(req, res) {
-	try {
-		const email = req.body.email;
-		if (!email.trim()) {
-			return sendJsonResponse(res, 400, false, 'Provide email to continue')
-		}
-		if (!EMAIL_REGEX.test(email.trim().toLowerCase())) {
-			return sendJsonResponse(res, 400, false, 'Invalid email address')
-		}
-		const isUser = await User.findOne({ email });
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'User not found')
-		}
-		const { success, message: _, plain, hashed } = await Token.generateToken({ email, purpose: 'verifyEmail' });
-		if (!success) {
-			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-		}
-		const state = crypto.randomBytes(16).toString('hex');
-		await TempSession.create({ state });
-
-		// Send verification email
-		await sendVerifyEmail(isUser.email, { username: isUser.username, verificationLink: `${process.env.BASE_URL}/auth/verify-email/${hashed}?kaf=${state}` });
-		return sendJsonResponse(res, 201, true, 'check email for token')
-	} catch (error) {
-		console.error('Error generating email verification token ', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-	}
-}
-
-module.exports.request_fp_OTP = async function(req, res) {
-	try {
-		const email = req.body;
-		if (!email.trim()) {
-			return sendJsonResponse(res, 400, false, 'Provide email to continue')
-		}
-		if (!EMAIL_REGEX.test(email.trim().toLowerCase())) {
-			return sendJsonResponse(res, 400, false, 'Invalid email address')
-		}
-		const isUser = await User.findOne({ email })
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'user not found')
-		}
-		if (isUser.onKillList) {
-			return sendJsonResponse(res, 403, true, 'user has been scheduled to be deleted', { onKillList: true })
-		}
-
-		const { success, message: _, plain } = await Token.generateToken({ email, purpose: 'forgotPassword' })
-		if (!success) {
-			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-		}
-
-		await sendForgotPasswordEmail(isUser.email, { username: isUser.username, token: plain })
-		return sendJsonResponse(res, 200, true, 'check email for token')
-	} catch (error) {
-		console.error('Error generating forgotPassword token', error)
 		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
 	}
 }
@@ -626,16 +509,6 @@ module.exports.checkUsername = async function(req, res) {
 	}
 }
 
-/*******DO NOT TOUCH ****/
-//worked hard for it 
-// HTML templates for success and error responses
-const successTemplate = () => `
-
-`;
-
-const errorTemplate = (message = '', redirectUrl = '/signin') => `
-
-`;
 
 
 module.exports.emailVerification = async (req, res) => {
