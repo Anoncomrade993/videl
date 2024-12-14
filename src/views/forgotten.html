@@ -9,13 +9,11 @@
 	<!-- Fallback favicons  -->
 	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
 	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
+	<link rel="stylesheet" href="/styles.css">
 	<title>Forgot Password - Videl</title>
-	<script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-white min-h-screen overflow-x-hidden">
-	<!-- Toast Notification System -->
-	<div id="toast-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
 	<!-- Navigation -->
 	<nav class="fixed w-full z-20 top-0 left-0 border-b border-gray-200 bg-white/90 backdrop-blur-md">
@@ -77,7 +75,7 @@
 		</div>
 	</div>
 
-	<script type="module" src="/client/reset_password.js"></script>
+	<script type="module" src="/client/fp_password.js"></script>
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<script>
 		lucide.createIcons();

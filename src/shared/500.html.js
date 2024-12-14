@@ -1,4 +1,5 @@
-module.exports = () => `<!DOCTYPE html>
+module.exports = () => `
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,6 +7,7 @@ module.exports = () => `<!DOCTYPE html>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>500 - Internal Server Error</title>
 	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="stylesheet" href="../public/styles.css">
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<style>
 		@keyframes hypnoWobble {
@@ -28,7 +30,7 @@ module.exports = () => `<!DOCTYPE html>
 
 <body class="bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center justify-center">
 	<div class="hypno-container max-w-md w-full bg-white rounded-xl shadow-2xl overflow-hidden p-8 text-center">
-		<div class="flex justify-center mb-6">
+		<div class="flex justify-center mb-6 p-5">
 			<i data-lucide="server-crash" class="text-red-500" width="64" height="64"></i>
 		</div>
 

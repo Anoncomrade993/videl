@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+module.exports = (uemail="") =>
+	`<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,8 +10,8 @@
 	<!-- Fallback favicons  -->
 	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
 	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
-	<link rel="stylesheet" href="../public/styles.css">
-	<title>Reset Password - Videl</title>
+	<link rel="stylesheet" href="/styles.css">
+	<title>Change Password - Videl</title>
 </head>
 
 <body class="bg-white min-h-screen overflow-x-hidden">
@@ -24,21 +25,21 @@
 		</div>
 	</nav>
 
-	<!-- Reset Password Section -->
+	<!--  Password Section -->
 	<div class="pt-16 sm:pt-24 bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center px-4 sm:px-6 lg:px-8">
-		<div class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden reset-password-card">
+		<div class="w-full max-w-md mx-auto bg-white rounded-xl shadow-2xl overflow-hidden change-password-card">
 			<div class="p-6 sm:p-8 md:p-10">
 				<div class="mb-4 sm:mb-6 flex justify-center">
 					<i data-lucide="lock" class="w-10 sm:w-12 h-10 sm:h-12 text-orange-600"></i>
 				</div>
 				<h2 class="text-2xl sm:text-3xl font-extrabold text-center text-gray-900 mb-3 sm:mb-4 heading">
-					Reset Password
+					 Password Change 
 				</h2>
 				<p class="text-gray-600 text-center mb-4 sm:mb-6 text-sm sm:text-base">
 					Enter your new password below
 				</p>
 
-				<div id="reset-password-form" class="space-y-4 sm:space-y-6">
+				<div id="change-password-form" class="space-y-4 sm:space-y-6">
 					<!-- New Password Input -->
 					<div>
 						<label for="new-password" class="block text-sm font-medium text-gray-700 mb-2">
@@ -80,7 +81,7 @@
 					<!-- Submission Button -->
 					<div>
 						<button type="submit" class="w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm sm:text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 active:scale-[0.98] transition-transform">
-							Reset password
+							Update password
 						</button>
 					</div>
 				</div>
@@ -108,15 +109,15 @@
 
 			// Update the strength indicator
 			const strengthPercentage = (strength / 5) * 100;
-			passwordStrengthIndicator.style.width = `${strengthPercentage}%`;
+			passwordStrengthIndicator.style.width = \`\$\{strengthPercentage\}\ % \`;
 			passwordStrengthIndicator.style.backgroundColor = strengthPercentage < 50 ? 'red' : 'green';
 		});
 	</script>
-	<script type="module" src="/client/rs_password.js"></script>
+	<script type="module" src="/client/c_password.js"></script>
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<script>
 		lucide.createIcons();
 	</script>
 </body>
 
-</html>
+</html>`

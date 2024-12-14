@@ -1,3 +1,5 @@
+module.exports = (uemail = "") =>
+	`
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,7 +11,7 @@
 	<!-- Fallback favicons  -->
 	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
 	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
-	<link rel="stylesheet" href="../public/styles.css">
+	<link rel="stylesheet" href="/styles.css">
 	<title>Reset Password - Videl</title>
 </head>
 
@@ -108,7 +110,7 @@
 
 			// Update the strength indicator
 			const strengthPercentage = (strength / 5) * 100;
-			passwordStrengthIndicator.style.width = `${strengthPercentage}%`;
+			passwordStrengthIndicator.style.width = \`\$\{strengthPercentage\}\%\`;
 			passwordStrengthIndicator.style.backgroundColor = strengthPercentage < 50 ? 'red' : 'green';
 		});
 	</script>
@@ -120,3 +122,4 @@
 </body>
 
 </html>
+`

@@ -4,9 +4,14 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Profile - Videl</title>
+	<!-- Favicon -->
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<!-- Fallback favicons  -->
+	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
+	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
 	<link rel="stylesheet" href="/styles.css">
-	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+	<title>Profile - Videl</title>
 </head>
 
 <body class="bg-gray-50 min-h-screen">
@@ -123,57 +128,11 @@
 		</div>
 	</div>
 
-	<style>
-		/* Dark mode toggle switch */
-		.switch {
-			position: relative;
-			display: inline-block;
-			width: 40px;
-			height: 20px;
-		}
 
-		.switch .slider {
-			position: absolute;
-			cursor: pointer;
-			top: 0;
-			left: 0;
-			right: 0;
-			bottom: 0;
-			background-color: #ccc;
-			transition: .4s;
-			border-radius: 34px;
-		}
-
-		.switch .slider:before {
-			position: absolute;
-			content: "";
-			height: 16px;
-			width: 16px;
-			left: 2px;
-			bottom: 2px;
-			background-color: white;
-			transition: .4s;
-			border-radius: 50%;
-		}
-
-		.switch input:checked+.slider {
-			background-color: #4CAF50;
-		}
-
-		.switch input:checked+.slider:before {
-			transform: translateX(20px);
-		}
-	</style>
-
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<script>
 		// Initialize Lucide icons
 		lucide.createIcons();
-
-		// Dark mode toggle
-		const darkModeToggle = document.querySelector('.switch input');
-		darkModeToggle.addEventListener('change', () => {
-			document.documentElement.classList.toggle('dark');
-		});
 	</script>
 </body>
 

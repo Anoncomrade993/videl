@@ -2,8 +2,6 @@ const mongoose = require('mongoose');
 const { verifyToken, hashToken } = require('../services/Scrypt.js');
 const { generate } = require('../utility/helpers.js');
 
-
-
 const tokenSchema = new mongoose.Schema({
 	email: { type: String, required: true, immutable: true },
 	hashed: { type: String, required: true, unique: true, immutable: true },
@@ -17,17 +15,22 @@ const tokenSchema = new mongoose.Schema({
 
 tokenSchema.index({ createdAt: 1 }, { expiresAfterSeconds: 300 });
 
-tokenSchema.statics.generateToken = async function(data = {}, length = 8) {
+tokenSchema.statics.generateToken = async function({ email, purpose }, length = 8, expirationDuration = 300000) {
 	try {
-		await this.deleteMany({ email: data.email, isUsed: false, purpose: data.purpose });
-		if (!data || Object.keys(data).length === 0) return { success: false, message: "Missing parameters", plain: null, hashed: null };
 
-		const plain = generate(length)
+		await this.deleteMany({ email, isUsed: false, purpose });
+		if (!email || !purpose) return { success: false, message: "Missing parameters", plain: null, hashed: null };
+
+		const plain = generate(length);
 		const hashed = await hashToken(plain);
 
+		const expiresAt = new Date(Date.now() + expirationDuration);
+
 		const token = await this.create({
-			...data,
-			hashed
+			email,
+			purpose,
+			hashed,
+			expiresAt
 		});
 		if (!token) return { success: false, message: "Error creating Token", plain: null, hashed: null };
 		return { success: true, message: "Token created successfully", plain, hashed: token.hashed };
@@ -37,76 +40,21 @@ tokenSchema.statics.generateToken = async function(data = {}, length = 8) {
 	}
 };
 
-
-// as the name states 🥲
-// DO NOT TOUCH 
-tokenSchema.statics.verifyEmailVerificationToken = async function(token) {
-	try {
-
-
-		if (!token) {
-			return {
-				status: 400,
-				success: false,
-				message: 'Verification token is required',
-				email: null
-			};
-		}
-
-
-		const isToken = await this.findOne({
-			isUsed: false,
-			hashed: token,
-			purpose: 'verifyEmail'
-		});
-
-
-		if (!isToken) {
-			return {
-				status: 404,
-				success: false,
-				message: 'Invalid or expired verification token',
-				email: null
-			};
-		}
-
-		// Update token status
-		isToken.isUsed = true;
-		await isToken.save();
-
-
-		return {
-			status: 200,
-			success: true,
-			message: 'Email verified successfully',
-			email: isToken.email
-		};
-
-	} catch (error) {
-		console.error('Error verifying email token', error)
-		return {
-			status: 500,
-			success: false,
-			message: 'Error verifying email',
-			email: null
-		};
-	}
+tokenSchema.statics.generateShortLivedToken = async function(email, purpose, length = 8) {
+	return this.generateToken(email, purpose, length, 5 * 60 * 1000);
 };
 
+tokenSchema.statics.generateLongLivedToken = async function(email, purpose, length = 8) {
+	return this.generateToken(email, purpose, length, 14 * 24 * 60 * 60 * 1000);
+};
 
-
-
-//for API specifically 
-tokenSchema.statics.verifyToken = async function(data = {}) {
+tokenSchema.statics.verifyToken = async function(email, purpose) {
 	try {
-		const { email, token, purpose } = data;
-
-		if (!email || !token || !purpose) {
+		if (!email || !purpose) {
 			return { success: false, status: 400, message: "Missing parameters" };
 		}
 
 		const tokenDoc = await this.findOne({
-			email,
 			purpose,
 			isUsed: false
 		});
@@ -121,14 +69,14 @@ tokenSchema.statics.verifyToken = async function(data = {}) {
 			return { success: false, status: 400, message: "Invalid token" };
 		}
 
-		// Mark token as used
-
-		await this.findByIdAndUpdate(tokenDoc._id, { isUsed: true });
+		tokenDoc.isUsed = true;
+		await tokenDoc.save();
 
 		return {
 			success: true,
 			status: 200,
 			message: "Token verified successfully",
+			email: tokenDoc.email
 		};
 	} catch (error) {
 		console.error('Error verifying token:', error);

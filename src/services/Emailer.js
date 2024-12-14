@@ -1,6 +1,6 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const { deletUser, verifyEmail, changeEmail, forgotPassword, changePassword } = require('../shared/templates.js');
+const { deletUser, verifyEmail, changeEmail, forgotPassword, changePassword } = require('../shared/emailTemplates.js');
 
 
 
