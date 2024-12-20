@@ -41,10 +41,10 @@ module.exports.registerUser = async function(req, res) {
 		if (!success) return sendJsonResponse(res, 500, false, message)
 
 		// Generate verification token
-		const { success: created, status, message, plain, hashed } = await Token.generateShortLivedToken({ email, purpose: 'verifyEmail' });
+		const { success: created, status, message:msg, plain, hashed } = await Token.generateShortLivedToken({ email, purpose: 'verifyEmail' });
 
 		if (!created) {
-			return sendJsonResponse(res, status, created, message)
+			return sendJsonResponse(res, status, created, msg)
 		}
 
 		const csrf = await Csrf.generateToken(email, 'verifyEmail')
