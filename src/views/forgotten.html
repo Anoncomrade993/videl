@@ -9,11 +9,12 @@
 	<!-- Fallback favicons  -->
 	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
 	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
-	<link rel="stylesheet" href="/styles.css">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../public/styles.css">
 	<title>Forgot Password - Videl</title>
 </head>
 
-<body class="bg-white min-h-screen overflow-x-hidden">
+<body class="bg-white min-h-screen font-['Inter'] overflow-x-hidden">
 
 	<!-- Navigation -->
 	<nav class="fixed w-full z-20 top-0 left-0 border-b border-gray-200 bg-white/90 backdrop-blur-md">
@@ -55,8 +56,8 @@
 
 					<!-- Submission Button -->
 					<div>
-						<button id="submit-btn" type="button" class="w-full flex justify-center py-2.5 sm:py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors duration-300">
-							Proceed
+						<button id="submit" type="button" class="w-full flex justify-center py-2 sm:py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm sm:text-base font-medium text-white bg-orange-600 hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 active:scale-[0.98] transition-transform">
+							Reset password
 						</button>
 					</div>
 
@@ -75,7 +76,7 @@
 		</div>
 	</div>
 
-	<script type="module" src="/client/fp_password.js"></script>
+	<script type="module" src="/client/forgotten_paswsword.js"></script>
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<script>
 		lucide.createIcons();

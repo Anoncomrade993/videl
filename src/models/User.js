@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-		links: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Link' }]
+	links: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Link' }]
 }, { timestamps: true })
 
 userSchema.index({ createdAt: 1 })

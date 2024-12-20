@@ -6,7 +6,7 @@
  * @Author - MockingBugs
  */
 require('dotenv').config();
-const rateLimit = require('express-rate-limit');
+const { rateLimit } = require('middleware-rate-limit');
 
 const { sendJsonResponse } = require('../utility/helpers.js')
 const { logAuditAction } = require('./audit.js')
@@ -59,17 +59,14 @@ module.exports.attackMiddleware = async function(req, res, next) {
 	next();
 };
 
-// Token request rate limiter
-module.exports.tokenRequestLimiter = rateLimit({
-	windowMs: 60 * 60 * 1000, // 1 hour window
-	max: 3, // limit each IP to 3 token requests per hour
-	message: {
-		error: 'Too Many Token Requests',
-		message: 'You have exceeded the token request limit. Please try again later.'
-	},
-	standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-	handler: (req, res, next, options) => {
-		res.status(429).json(options.message);
+
+module.exports.tokenRateLimiter = rateLimit({
+	limit: 5, // 5 requests
+	duration: 15 * 60, // 15 minutes
+	onLimitReached: (req, res, options) => {
+		res.status(429).json({
+			success: false,
+			message: 'Rate limit exceeded'
+		});
 	}
 });

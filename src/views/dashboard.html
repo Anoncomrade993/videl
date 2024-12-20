@@ -5,10 +5,13 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Dashboard - Videl</title>
-	<!--	<script src="https://cdn.tailwindcss.com"></script>-->
-
-	<link rel="stylesheet" href="../public/styles.css">
-	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+	<!-- Favicon -->
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<!-- Fallback favicons  -->
+	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
+	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="/styles.css">
 </head>
 
 <body class="bg-gray-50">
@@ -54,7 +57,7 @@
 					<% if (isAuthWithGitSigned) { %>
 					<li>
 						<a href="#" class="flex items-center p-2 text-gray-900 rounded-lg hover:bg-orange-50 group">
-							<i data-lucide="layout" class="w-5 h-5 text-gray-500 group-hover:text-orange-600"></i>
+							<i data-lucide="github" class="w-5 h-5 text-gray-500 group-hover:text-orange-600"></i>
 							<span class="ml-3">Repos</span>
 						</a>
 					</li>
@@ -182,7 +185,7 @@
 			</div>
 		</div>
 	</div>
-
+	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<script>
 		// Mobile Menu Toggle
 		const mobileMenuToggle = document.getElementById('mobile-menu-toggle');

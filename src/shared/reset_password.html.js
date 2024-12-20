@@ -1,4 +1,4 @@
-module.exports = (uemail = "") =>
+module.exports = (uemail = "", token = "") =>
 	`
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +11,7 @@ module.exports = (uemail = "") =>
 	<!-- Fallback favicons  -->
 	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
 	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
-	<link rel="stylesheet" href="/styles.css">
+		<script src="https://cdn.tailwindcss.com"></script>
 	<title>Reset Password - Videl</title>
 </head>
 
@@ -46,7 +46,9 @@ module.exports = (uemail = "") =>
 						<label for="new-password" class="block text-sm font-medium text-gray-700 mb-2">
 							New Password
 						</label>
-						<input id="uemail" type="text" value="${uemail}" disabled hidden>
+						<input id="uemail" type="text" value="${uemail}"  hidden>
+						<input id="token" type="text" value="${token}"  hidden>
+	
 						<div class="relative">
 							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
 								<i data-lucide="key" class="w-4 sm:w-5 h-4 sm:h-5 text-gray-400 input-icon"></i>
@@ -114,7 +116,7 @@ module.exports = (uemail = "") =>
 			passwordStrengthIndicator.style.backgroundColor = strengthPercentage < 50 ? 'red' : 'green';
 		});
 	</script>
-	<script type="module" src="/client/rs_password.js"></script>
+	<script type="module" src="/client/reset_password.js"></script>
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<script>
 		lucide.createIcons();

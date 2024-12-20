@@ -15,7 +15,8 @@ const csrfSchema = new mongoose.Schema({
             'changeEmail',
             'changePassword',
             'forgotPassword',
-            'deleteUser'
+            'deleteUser',
+            'github'
         ]
 	},
 	email: {
@@ -51,7 +52,7 @@ csrfSchema.statics.verifyToken = async function(token, purpose) {
 	csrfToken.used = true;
 	await csrfToken.save();
 
-	return true;
+	return csrfToken;
 };
 
 csrfSchema.index({ createdAt: 1 }, { expireAfterSeconds: 600 });

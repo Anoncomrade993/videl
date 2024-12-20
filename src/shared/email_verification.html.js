@@ -12,7 +12,7 @@ module.exports = () => `
 	<!-- Fallback favicons -->
 	<link rel="icon" type="image/x-icon" sizes="32x32" href="/videl32.ico">
 	<link rel="icon" type="image/x-icon" sizes="48x48" href="/videl48.ico">
-	<link rel="stylesheet" href="/styles.css">
+		<script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-gradient-to-br from-orange-50 to-orange-100 min-h-screen flex items-center justify-center">

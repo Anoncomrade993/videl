@@ -6,8 +6,7 @@ module.exports = () => `
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>500 - Internal Server Error</title>
-	<script src="https://cdn.tailwindcss.com"></script>
-	<link rel="stylesheet" href="../public/styles.css">
+	<link rel="stylesheet" href="/styles.css">
 	<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
 	<style>
 		@keyframes hypnoWobble {

@@ -1,6 +1,12 @@
 require('dotenv').config();
 const nodemailer = require('nodemailer');
-const { deletUser, verifyEmail, changeEmail, forgotPassword, changePassword } = require('../shared/emailTemplates.js');
+const {
+	deleteUser,
+	emailVerification,
+	changePassword,
+	changeEmail,
+	forgottenPassword
+} = require('../shared/email_templates.js');
 
 
 
@@ -43,10 +49,10 @@ async function sendEmail(recipientEmail, subject, template, data = {}) {
 
 module.exports = {
 	sendVerifyEmail: async (recipientEmail, data) => {
-		return sendEmail(recipientEmail, "Email verification", verifyEmail, data);
+		return sendEmail(recipientEmail, "Email verification", emailVerification, data);
 	},
 	sendForgotPasswordEmail: async (recipientEmail, data) => {
-		return sendEmail(recipientEmail, "Account recovery", forgotPassword, data);
+		return sendEmail(recipientEmail, "Account recovery", forgottenPassword, data);
 	},
 	sendEmailChangeEmail: async (recipientEmail, data) => {
 		return sendEmail(recipientEmail, "Email Change", changeEmail, data);
@@ -55,6 +61,6 @@ module.exports = {
 		return sendEmail(recipientEmail, "Password Change", changePassword, data);
 	},
 	sendDeleteUserEmail: async (recipientEmail, data) => {
-		return sendEmail(recipientEmail, "Account Deletion", deletUser, data);
+		return sendEmail(recipientEmail, "Account Deletion", deleteUser, data);
 	}
 };

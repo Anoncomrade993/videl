@@ -1,10 +1,10 @@
-const TempSession = require('../models/TempSession.js')
+const Csrf = require('../models/Csrf.js')
 const Token = require('../models/Token.js')
 const User = require('../models/User.js')
 const Schedule = require('../models/Schedule.js')
 const Scrypt = require('../services/Scrypt.js')
 
-const { sendJsonResponse, } = require('../utility/helpers.js')
+const { sendJsonResponse, constructLink } = require('../utility/helpers.js')
 const { EMAIL_REGEX } = require('../constants.js')
 const {
 	sendVerifyEmail,
@@ -41,15 +41,19 @@ module.exports.registerUser = async function(req, res) {
 		if (!success) return sendJsonResponse(res, 500, false, message)
 
 		// Generate verification token
-		const { success: created, message: _, plain, hashed } = await Token.generateShortLivedToken({
-			email,
-			purpose: 'verifyEmail'
-		});
+		const { success: created, status, message, plain, hashed } = await Token.generateShortLivedToken({ email, purpose: 'verifyEmail' });
 
 		if (!created) {
-			return sendJsonResponse(res, 500, false, 'Internal server error occurred ')
+			return sendJsonResponse(res, status, created, message)
 		}
 
+		const csrf = await Csrf.generateToken(email, 'verifyEmail')
+		if (!csrf) {
+			return sendJsonResponse(res, 500, false, 'Something went wrong,try again')
+		}
+		const tokenLink = constructLink(csrf.token, hashed, 'verify-email')
+
+		/****/
 		req.session.user = {
 			email: user.email,
 			userId: user._id,
@@ -61,11 +65,9 @@ module.exports.registerUser = async function(req, res) {
 		}
 		await saveSession(req);
 
-		const state = crypto.randomBytes(16).toString('hex');
-		await TempSession.create({ state });
 
 		// Send verification email
-		await sendVerifyEmail(user.email, { username, verificationLink: `${process.env.BASE_URL}/auth/verify-email/${hashed}?kaf=${state}` });
+		await sendVerifyEmail(user.email, { username, tokenLink });
 
 		return sendJsonResponse(res, 201, true, 'User created successfully. Please verify your email.')
 	} catch (error) {
@@ -73,7 +75,6 @@ module.exports.registerUser = async function(req, res) {
 		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
 	}
 }
-
 
 module.exports.loginUser = async function(req, res) {
 	try {
@@ -132,224 +133,6 @@ module.exports.logoutUser = function(req, res) {
 	}
 }
 
-
-module.exports.changeEmail = async function(req, res) {
-	try {
-		const { token, email, password } = req.body;
-		const user = req.session.user;
-
-		if (!user || Object.keys(user).length === 0) {
-			return sendJsonResponse(res, 401, false, 'You are not authenticated')
-		}
-
-		if (!token.trim() || !email.trim()) {
-			return sendJsonResponse(res, 400, false, 'Provide credentials to continue')
-		}
-		if (!EMAIL_REGEX.test(email.trim().toLowerCase())) {
-			return sendJsonResponse(res, 400, false, 'Invalid email address')
-		}
-		const exists = await User.exists({ email })
-		if (exists) {
-			return sendJsonResponse(res, 400, false, 'Email address already in use')
-		}
-
-		const { success, message: _ } = await Token.verifyToken({ email, purpose: 'changeEmail', token });
-		if (!success) {
-			return sendJsonResponse(res, 404, false, 'Invalid or expired token')
-		}
-		const isUser = await User.findOne({ _id: user.userId });
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'user does not exist')
-		}
-		if (isUser.onKillList) {
-			return sendJsonResponse(res, 403, true, 'user has been scheduled to be deleted', { onKillList: true })
-		}
-		const isPassword = await isUser.comparePassword(password);
-		if (!isPassword) {
-			return sendJsonResponse(res, 401, false, 'Password is incorrect')
-		}
-		isUser.email = email;
-		await user.save()
-	} catch (error) {
-		console.error('Error changing user email', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-	}
-}
-
-module.exports.changePassword = async function(req, res) {
-	try {
-		const { currPassword, newPassword, token } = req.body;
-		const user = req.session.user;
-
-		if (!user || Object.keys(user).length === 0) {
-			return sendJsonResponse(res, 401, false, 'You are not authenticated')
-		}
-
-		if (!currPassword.trim() || !newPassword.trim() || !token.trim()) {
-			return sendJsonResponse(res, 400, false, 'Provide credentials to continue')
-		}
-
-		const isUser = await User.findOne({ _id: user.userId });
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'user does not exist')
-		}
-		if (isUser.onKillList) {
-			return sendJsonResponse(res, 403, true, 'user has been scheduled to be deleted', { onKillList: true })
-		}
-
-		const { success, message: _ } = await Token.verifyToken({ email: isUser.email, purpose: 'changePassword', token })
-		if (!success) {
-			return sendJsonResponse(res, 404, false, 'Token invalid or expired')
-		}
-		const isPassword = await isUser.comparePassword(currPassword);
-		if (!isPassword) {
-			return sendJsonResponse(res, 400, false, 'Current password mismatched')
-		}
-
-		const isSamePassword = await isUser.comparePassword(newPassword);
-		if (isSamePassword) {
-			return sendJsonResponse(res, 400, false, 'New password shouldn\'t match current one')
-		}
-
-
-
-		isUser.password = await Scrypt.verifyToken(newPassword);
-		await isUser.save()
-		return sendJsonResponse(res, 200, true, 'Password changed successfully')
-	} catch (error) {
-		console.error('Error changing user password', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-	}
-}
-
-module.exports.forgotPassword = async function(req, res) {
-	try {
-		const { email, token, newPassword } = req.body;
-		const user = req.session.user;
-
-		if (user || Object.keys(user).length !== 0) {
-			await destroySession(req).then(() => res.clearCookie('connect.sid')).catch(err => {
-				return sendJsonResponse(res, 500, false, 'Internal server error occurred ')
-			})
-		}
-
-		if (!email.trim() || !newPassword.trim() || !token.trim()) {
-			return sendJsonResponse(res, 400, false, 'Provide credentials to continue')
-		}
-		if (!EMAIL_REGEX.test(email)) {
-			return sendJsonResponse(res, 400, false, 'Invalid email address')
-		}
-		const isUser = await User.findOne({ email });
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'user not found')
-		}
-		if (isUser.onKillList) {
-			return sendJsonResponse(res, 403, true, 'user has been scheduled to be deleted', { onKillList: true })
-		}
-		const { success, message: _ } = await Token.verifyToken({ email: isUser.email, purpose: 'forgotPassword', token })
-		if (!success) {
-			return sendJsonResponse(res, 404, false, 'Token invalid or expired')
-		}
-		isUser.password = await Scrypt.verifyToken(newPassword);
-		await isUser.save()
-		return sendJsonResponse(res, 200, true, 'Password updated successfully');
-	} catch (error) {
-		console.error('Error updating password on forgotten password', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-	}
-}
-
-
-
-module.exports.deleteUser = async function(req, res) {
-	try {
-		const { currPassword, token } = req.body;
-		const user = req.session.user;
-
-		if (!user || Object.keys(user).length === 0) {
-			return sendJsonResponse(res, 401, false, 'You are not authenticated')
-		}
-
-		if (!currPassword.trim() || !token.trim()) {
-			return sendJsonResponse(res, 400, false, 'Provide credentials to continue')
-		}
-
-		const isUser = await User.findOne({ _id: user.userId });
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'user does not exist')
-		}
-		if (isUser.onKillList) {
-			return sendJsonResponse(res, 403, true, 'user already scheduled to be deleted', { onKillList: true })
-		}
-
-		const { success, message: _, plain } = await Token.verifyToken({ email: isUser.email, purpose: 'deleteUser', token })
-		if (!success) {
-			return sendJsonResponse(res, 404, false, 'Token invalid or expired')
-		}
-
-		const isPassword = await isUser.comparePassword(currPassword);
-		if (!isPassword) {
-			return sendJsonResponse(res, 400, false, 'Current password mismatched')
-		}
-
-		const tweeks = new Date(Date.now() + (14 * 24 * 3600 * 1000))
-		const { success: done, status, message } = await Schedule.createSchedule(isUser._id);
-		if (!done) {
-			return sendJsonResponse(res, status, done, message)
-		}
-
-		isUser.onKillList = true;
-		await isUser.save();
-		await sendDeleteUserEmail(isUser.email, { username: isUser.username, date: tweeks.toUTCString(), token: plain, url: '' })
-		return sendJsonResponse(res, 200, true, 'account deletion scheduled successfully')
-	} catch (error) {
-		console.error('Error changing user password', error)
-		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-	}
-}
-
-
-module.exports.cancelDeleteUser = async function(req, res)
-{
-	try {
-		const { token, email } = req.body;
-		const user = req.session.user;
-
-		if (user || Object.keys(user).length !== 0) {
-			destroySession(req).then(() => res.clearCookie('connect.sid')).catch(err => sendJsonResponse(res, 500, false, 'Internal server error occurred'))
-		}
-		if (!token.trim() || token.trim().length > 8 || !email.trim()) {
-			return sendJsonResponse(res, 400, false, 'missing parameter or invalid toke')
-		}
-		if (!EMAIL_REGEX.test(email.trim().toLowerCase())) {
-			return sendJsonResponse(res, 400, false, 'invalid email address')
-		}
-		const isUser = await User.findOne({ email });
-		if (!isUser) {
-			return sendJsonResponse(res, 404, false, 'user not found')
-		}
-		if (!isUser.onKillList) {
-			return sendJsonResponse(res, 403, false, 'You are not allowed to perform this action')
-		}
-
-		const { success, status, message } = await Token.verifyToken({ email: isUser.email, purpose: 'deleteUser', token })
-		if (!success) {
-			return sendJsonResponse(res, status, success, message)
-		}
-		const { success: isCancelled } = await Schedule.cancelSchedule(isUser._id)
-		if (!isCancelled) {
-			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
-		}
-		isUser.onKillList = false;
-		await isUser.save();
-		return sendJsonResponse(res, 200, true, 'account deletion cancelled successfully')
-	} catch (error) {
-		console.error('Error canceling user delete', error)
-		return sendJsonResponse(res, 500, false, 'internal server error occurred')
-	}
-}
-
-
 module.exports.getUserProfile = async function(req, res) {
 	try {
 		const user = req.session.user;
@@ -370,22 +153,21 @@ module.exports.getUserProfile = async function(req, res) {
 	}
 }
 
-
-
-
-
 module.exports.signInWithGithub = async function(req, res) {
 	try {
 
-		const state = crypto.randomBytes(16).toString('hex');
-		await TempSession.create({ state });
+
+		const csrf = await Csrf.generateToken('githubLogin@videl.com', 'github')
+		if (!csrf) {
+			return sendJsonResponse(res, 500, false, 'Something went wrong,try again')
+		}
 
 		// Construct GitHub OAuth URL
 		const githubAuthURL = `https://github.com/login/oauth/authorize?` +
 			`client_id=${process.env.GITHUB_CLIENT_ID}` +
 			`&redirect_uri=${process.env.GITHUB_REDIRECT_URI}` +
 			`&scope=user:email` +
-			`&state=${state}`;
+			`&state=${csrf}`;
 		res.redirect(302, githubAuthURL);
 	} catch (error) {
 		console.error('Error initializing Login with GitHub', error)
@@ -393,23 +175,22 @@ module.exports.signInWithGithub = async function(req, res) {
 	}
 }
 
-
 module.exports.githubRegistrationCallBack = async function(req, res) {
-	const { code, state } = req.query;
+	const { code, csrf } = req.query;
 
-	if (!code.trim() || !state.trim()) {
+	if (!code.trim() || !csrf.trim()) {
 		return sendJsonResponse(res, 400, false, 'Provide needed parameters')
 	}
 
-	const tempSess = await TempSession.findOne({ state });
+	const _csrf = await Csrf.verifyToken(csrf, 'github');
 
 	// Validate state to prevent CSRF
-	if (!tempSess) {
+	if (!_csrf) {
 		return sendJsonResponse(res, 403, false, 'Invalid state parameter');
 	}
 
 	// Remove state after validation
-	await TempSession.deleteOne({ state });
+	await Csrf.deleteOne({ token: _csrf, isUsed: true });
 
 	try {
 		// Exchange code for access token
@@ -508,41 +289,3 @@ module.exports.checkUsername = async function(req, res) {
 		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
 	}
 }
-
-
-
-module.exports.emailVerification = async (req, res) => {
-	try {
-		const token = req.params.token?.trim();
-		const csrf = req.query.kaf?.trim();
-
-		if (!token || !csrf) {
-			return res.status(400).send(errorTemplate("Token or CSRF is missing."));
-		}
-
-		const tempSess = await TempSession.findOne({ state: csrf });
-		if (!tempSess) {
-			return res.status(403).send(errorTemplate("Invalid CSRF token."));
-		}
-
-		await TempSession.deleteOne({ state: csrf });
-
-		const { status, success, message, email } = await Token.verifyEmailVerificationToken(token);
-		if (!success) {
-			return res.status(status).send(errorTemplate(message || "Token verification failed."));
-		}
-
-		const userUpdateResult = await User.findOneAndUpdate({ email }, { $set: { isVerified: true } }, { new: true });
-
-		if (!userUpdateResult) {
-			return res.status(404).send(errorTemplate("User not found."));
-		}
-
-		console.log(`User verified: ${email}`);
-		return res.status(200).send(successTemplate());
-
-	} catch (error) {
-		console.error('Error verifying user email:', error);
-		return res.status(500).send(errorTemplate("Internal server error."));
-	}
-};
