@@ -6,7 +6,7 @@
  * @Author - MockingBugs
  */
 require('dotenv').config();
-const { rateLimit } = require('middleware-rate-limit');
+//const { rateLimit } = require('middleware-rate-limit');
 
 const { sendJsonResponse } = require('../utility/helpers.js')
 const { logAuditAction } = require('./audit.js')
@@ -60,13 +60,3 @@ module.exports.attackMiddleware = async function(req, res, next) {
 };
 
 
-module.exports.tokenRateLimiter = rateLimit({
-	limit: 5, // 5 requests
-	duration: 15 * 60, // 15 minutes
-	onLimitReached: (req, res, options) => {
-		res.status(429).json({
-			success: false,
-			message: 'Rate limit exceeded'
-		});
-	}
-});
