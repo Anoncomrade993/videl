@@ -46,7 +46,7 @@ csrfSchema.statics.verifyToken = async function(token, purpose) {
 	});
 
 	if (!csrfToken) {
-		throw new Error('Invalid or expired token');
+		return null
 	}
 
 	csrfToken.used = true;
