@@ -64,12 +64,16 @@ tokenSchema.statics.verifyToken = async function(token, purpose) {
 			return { success: false, status: 404, message: "Invalid or expired token" };
 		}
 
-		const isValid = await verifyToken(token, tokenDoc.hashed);
 
-		if (!isValid) {
-			return { success: false, status: 400, message: "Invalid token" };
-		}
+		/** 
+		 * since hashed token is used,no need for matching again 
+ 		
+				const isValid = await verifyToken(token, tokenDoc.hashed);
 
+				if (!isValid) {
+					return { success: false, status: 400, message: "Invalid token" };
+				}
+		**/
 		tokenDoc.isUsed = true;
 		await tokenDoc.save();
 
@@ -84,5 +88,7 @@ tokenSchema.statics.verifyToken = async function(token, purpose) {
 		return { success: false, status: 500, message: "Internal error occurred" };
 	}
 };
+
+
 
 module.exports = mongoose.model('Token', tokenSchema);
