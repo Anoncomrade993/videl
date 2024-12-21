@@ -21,7 +21,7 @@ const {
 } = require('../services/Emailer.js');
 
 const { saveSession, destroySession } = require('../middlewares/session.js')
-const { sendJsonResponse } = require('../utility/helpers.js')
+const { sendJsonResponse, constructLink } = require('../utility/helpers.js')
 const { EMAIL_REGEX } = require('../constants.js')
 
 module.exports.request_fp_token = async function(req, res) {
@@ -227,7 +227,7 @@ module.exports.GET_emailVerification = async (req, res) => {
 		const kaf = req.query.kaf?.trim();
 
 		if (!token || !kaf) {
-			return res.status(400).send(errorTemplate('Token or CSRF is missing.'));
+			return res.status(400).send(errorTemplate('400','Token or CSRF is missing.'));
 		}
 
 		const csrf = await Csrf.verifyToken(kaf, 'verifyEmail');
@@ -249,7 +249,7 @@ module.exports.GET_emailVerification = async (req, res) => {
 		return res.status(200).send(emailVerificationTemplate());
 	} catch (error) {
 		console.error('Error verifying user email:', error);
-		return res.status(500).send(errorTemplate('Internal server error.'));
+		return res.status(500).send(errorTemplate('500','Internal server error.'));
 	}
 };
 
