@@ -126,7 +126,7 @@ module.exports.logoutUser = function(req, res) {
 		destroySession(req).then(() => res.clearCookie('connect.sid')).catch(err => {
 			return sendJsonResponse(res, 500, false, 'Internal server error occurred')
 		});
-		return sendJsonResponse(res, 200, true, 'session destroyed successfully')
+		return res.redirect(302, '/signin')
 	} catch (error) {
 		console.error('Error clearing user cookies', error)
 		return sendJsonResponse(res, 500, false, 'Internal server error occurred')
