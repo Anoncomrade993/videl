@@ -73,7 +73,8 @@
  		directives: {
  			defaultSrc: ["'self'"],
  			scriptSrc: ["'self'", "'unsafe-inline'", "https://unpkg.com"],
- 			styleSrc: ["'self'", "'unsafe-inline'"],
+ 			
+ 			styleSrc: ["'self'", "'unsafe-inline'","https://fonts.googleapis.com"],
  			imgSrc: ["'self'", "data:", "https:"],
  		},
  	},

@@ -1,4 +1,4 @@
-import Dialog from '../utils/Dialog'
+import Dialog from '../utils/Dialog.js'
 
 
 
