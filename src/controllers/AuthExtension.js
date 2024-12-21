@@ -197,9 +197,6 @@ module.exports.request_ce_token = async function(req, res) {
 	}
 }
 
-
-
-
 //delete user
 module.exports.request_du_token = async function(req, res) {
 	try {
@@ -227,7 +224,7 @@ module.exports.request_du_token = async function(req, res) {
 		// kill Date 
 		const twoWeeks = new Date(Date.now() + (14 * 24 * 60 * 60 * 1000)).toUTCString()
 
-		const tokenLink = constructLink(csrf.token, hashed, 'change-email')
+		const tokenLink = constructLink(csrf.token, hashed, 'cancel-delete-user')
 		await sendDeleteUserEmail(isUser.email, { username: isUser.username, tokenLink, date });
 		return sendJsonResponse(res, 200, true, 'account scheduled for delete ')
 	} catch (error) {
@@ -288,7 +285,7 @@ module.exports.GET_resetPassword = async (req, res) => {
 		if (!success) {
 			return res.status(status).send(errorTemplate(status, message || 'Token verification failed.'));
 		}
-		return res.status(200).send(resetPasswordTemplate(email.trim(),token.trim()))
+		return res.status(200).send(resetPasswordTemplate(email.trim(), token.trim()))
 	} catch (error) {
 		console.error('Error resetting password', error)
 		return res.status(500).send(errorTemplate('500', 'Internal server error occurred.'));
