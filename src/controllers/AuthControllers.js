@@ -41,7 +41,7 @@ module.exports.registerUser = async function(req, res) {
 		if (!success) return sendJsonResponse(res, 500, false, message)
 
 		// Generate verification token
-		const { success: created, status, message:msg, plain, hashed } = await Token.generateShortLivedToken({ email, purpose: 'verifyEmail' });
+		const { success: created, status, message: msg, plain, hashed } = await Token.generateShortLivedToken({ email, purpose: 'verifyEmail' });
 
 		if (!created) {
 			return sendJsonResponse(res, status, created, msg)
@@ -104,7 +104,7 @@ module.exports.loginUser = async function(req, res) {
 			isVerified: isUser.isVerified,
 			lastAccess: new Date(),
 			username: isUser.username,
-			avatar: user.avatar
+			avatar: isUser.avatar
 		}
 
 		await saveSession(req);
