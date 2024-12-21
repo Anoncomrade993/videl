@@ -9,7 +9,8 @@ const {
 	logoutUser,
 	signInWithGithub,
 	githubRegistrationCallBack,
-	checkUsername
+	checkUsername,
+	getUserProfile
 } = require('../controllers/AuthControllers.js')
 
 const {
