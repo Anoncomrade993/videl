@@ -37,7 +37,7 @@ const {
 
 authRouter.post('/register', registerUser);
 authRouter.post('/signin', loginUser)
-authRouter.post('/signout', requireAuth, logoutUser)
+authRouter.get('/signout', requireAuth, logoutUser)
 
 
 
