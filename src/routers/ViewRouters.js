@@ -37,7 +37,7 @@ uiRouter.get('/dashboard', requireAuthUI, async function(req, res) {
 			throw error
 		}
 		const { username, avatar, isAuthWithGitSigned = false } = user
-		return res.render('dashboard.html', { username, avatar, isAuthWithGithub })
+		return res.render('dashboard.html', { username, avatar, isAuthWithGitSigned })
 	} catch (error) {
 		console.error('Error rendering dashboard', error)
 		return res.render('500.html')
