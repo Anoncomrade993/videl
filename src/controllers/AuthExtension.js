@@ -1,14 +1,14 @@
 require('dotenv').config()
 const Csrf = require('../models/Csrf.js')
 const User = require('../models/User.js');
-const Token = require('../modela/Token.js')
+const Token = require('../models/Token.js')
 const Scrypt = require('../services/Scrypt.js')
 
-const errorTemplate = require('../shared/errorTemplate.html.js')
+const errorTemplate = require('../shared/error_template.html.js')
 
 const changeEmailTemplate = require('../shared/change_email.html.js')
 const emailVerificationTemplate = require('../shared/email_verification.html.js')
-const changePasswordTemplate = require('../shared/.change_password.html.js')
+const changePasswordTemplate = require('../shared/change_password.html.js')
 const resetPasswordTemplate = require('../shared/reset_password.html.js')
 const cancelDeleteUserTemplate = require('../shared/cancel_delete_user.html.js')
 
