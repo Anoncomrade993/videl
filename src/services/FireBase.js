@@ -1,123 +1,149 @@
-require('dotenv').config()
-const mime = require('mime-types');
+require('dotenv').config();
 const admin = require('firebase-admin');
+const fs = require('fs').promises;
+const path = require('path');
 
+
+const serviceAccount = require('../config/serv.js');
 const UPLOAD_STORAGE = process.env.UPLOAD_STORAGE;
 
 // Initialize Firebase Admin
-const serviceAccount = require('../config/serv.js');
 admin.initializeApp({
 	credential: admin.credential.cert(serviceAccount),
 	storageBucket: process.env.STORAGE_BUCKET
 });
 
-const bucket = admin.storage().bucket();
+const bucket = admin.storage().bucket();;
 
-async function uploadCaptureFile(req_file, buffer, customMetadata = {}, filename) {
-	// Determine the content type using mime-types
-	const contentType = mime.lookup(filename) || 
-		req_file.mimetype || 
-		'application/octet-stream';
 
-	const metadata = {
-		contentType: contentType,
-		metadata: {
-			...customMetadata,
-			userId: customMetadata.userId.toString(),
-			linkId: customMetadata.linkId,
-			captureId: customMetadata.captureId,
-			timestamp: Date.now().toString(),
-		},
+module.exports.findTemplate = async function(templateId) {
+	try {
+		const [files] = await bucket.getFiles({
+			prefix: `${UPLOAD_STORAGE}/${templateId}`
+		});
+
+		if (!files.length) {
+			return null;
+		}
+
+		const fileUrls = await Promise.all(
+			files.map(async (file) => {
+				const [url] = await file.getSignedUrl({
+					action: 'read',
+					expires: Date.now() + (12 * 7 * 24 * 60 * 60 * 1000),
+				});
+				return {
+					path: file.name,
+					url,
+					metadata: file.metadata?.metadata || {}
+				};
+			})
+		);
+
+		return fileUrls.length ? {
+			templateId,
+			files: fileUrls,
+			metadata: filteredFiles[0].metadata?.metadata || {}
+		} : null;
+	} catch (error) {
+		throw new Error(`Failed to find template: ${error.message}`);
+	}
+}
+
+module.exports.uploadTemplate = async function(templatePath, templateId) {
+	const files = {
+		html: '/index.html',
+		css: '/styles/style.css',
+		js: '/scripts/main.js',
+		assets: '/assets'
 	};
 
-	const filePath = `${UPLOAD_STORAGE}/${filename}`;
-	const file = bucket.file(filePath);
+	const uploadPromises = [];
 
+	for (const [type, filePath] of Object.entries(files)) {
+		if (type === 'assets') {
+			const assets = fs.readdirSync(path.join(templatePath, 'assets'));
+			for (const asset of assets) {
+				const fileUpload = bucket.upload(
+					path.join(templatePath, 'assets', asset),
+					{
+						destination: `${UPLOAD_STORAGE}/${templateId}/assets/${asset}`,
+						public: true
+					}
+				);
+				uploadPromises.push(fileUpload);
+			}
+		} else {
+			const fileUpload = bucket.upload(
+				path.join(templatePath, filePath),
+				{
+					destination: `${UPLOAD_STORAGE}/${templateId}${filePath}`,
+					public: true
+				}
+			);
+			uploadPromises.push(fileUpload);
+		}
+	}
+
+	await Promise.all(uploadPromises);
+	return templateId;
+}
+
+
+
+// Update template files
+module.exports.updateTemplate = async function(templateId, templatePath) {
+	// First delete existing files
+	await deleteTemplate(templateId);
+
+	const files = {
+		html: '/index.html',
+		css: '/styles/style.css',
+		js: '/scripts/main.js',
+		assets: '/assets'
+	};
+
+	const uploadPromises = [];
+
+	for (const [type, filePath] of Object.entries(files)) {
+		if (type === 'assets') {
+			const assets = fs.readdirSync(path.join(templatePath, 'assets'));
+			for (const asset of assets) {
+				const fileUpload = bucket.upload(
+					path.join(templatePath, 'assets', asset),
+					{
+						destination: `templates/${templateId}/assets/${asset}`,
+						public: true
+					}
+				);
+				uploadPromises.push(fileUpload);
+			}
+		} else {
+			const fileUpload = bucket.upload(
+				path.join(templatePath, filePath),
+				{
+					destination: `templates/${templateId}${filePath}`,
+					public: true
+				}
+			);
+			uploadPromises.push(fileUpload);
+		}
+	}
+
+	await Promise.all(uploadPromises);
+	return templateId;
+}
+
+// Delete template files
+module.exports.deleteTemplate = async function(templateId) {
+	const prefix = `templates/${templateId}/`;
 	try {
-		await file.save(buffer, {
-			metadata: metadata,
-			contentType: contentType,
-		});
-
-		const [url] = await file.getSignedUrl({
-			action: 'read',
-			expires: Date.now() + (24 * 3600 * 1000),
-		});
-
-		return url;
+		const [files] = await bucket.getFiles({ prefix });
+		const deletePromises = files.map(file => file.delete());
+		await Promise.all(deletePromises);
+		return true;
 	} catch (error) {
-		console.error('Upload error:', error);
+		console.error(`Error deleting template ${templateId}:`, error);
 		throw error;
 	}
 }
-
-async function findFileById(captureId) {
-	const [files] = await bucket.getFiles({ prefix: UPLOAD_STORAGE });
-
-	for (const file of files) {
-		const [metadata] = await file.getMetadata();
-		if (metadata.metadata && metadata.metadata.captureId === captureId) {
-			return { file, metadata };
-		}
-	}
-
-	return null;
-}
-
-async function findFilesByUserId(userId) {
-	const [files] = await bucket.getFiles({ prefix: UPLOAD_STORAGE });
-	const userFiles = [];
-
-	for (const file of files) {
-		const [metadata] = await file.getMetadata();
-		if (metadata.metadata && metadata.metadata.userId === userId) {
-			userFiles.push({ file, metadata });
-		}
-	}
-
-	return userFiles;
-}
-
-async function deleteAllFilesByUserId(userId) {
-	try {
-		const userFiles = await findFilesByUserId(userId);
-		if (userFiles.length === 0) {
-			return { count: 0, message: 'No files found' };
-		}
-		let deletedCount = 0;
-		for (const fileData of userFiles) {
-			try {
-				await fileData.file.delete();
-				deletedCount++;
-			} catch (error) {
-				console.error(`Error deleting file ${fileData.file.name}:`, error);
-			}
-		}
-		return { count: deletedCount, message: 'Deletion complete' };
-	} catch (error) {
-		console.error('Error in bulk file deletion:', error);
-		throw new Error('Bulk deletion failed');
-	}
-}
-
-async function downloadBuffer(captureId) {
-	try {
-		const fileData = await findFileById(captureId);
-		if (!fileData) {
-			return { success: false, buffer: null };
-		}
-		const [buffer] = await fileData.file.download();
-		return { success: true, buffer };
-	} catch (error) {
-		console.error('Error fetching file:', error);
-		return { success: false, buffer: null };
-	}
-}
-
-module.exports = {
-	uploadCaptureFile,
-	findFileById,
-	deleteAllFilesByUserId,
-	findFilesByUserId,
-	downloadBuffer
-};

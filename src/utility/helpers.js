@@ -25,6 +25,7 @@ const constructLink = function(kaf, hashed, endpoint) {
 	return `process.env.BASE_URL}/auth/${endpoint}/${hashed}`
 }
 
+
 module.exports = {
 	generate,
 	sendJsonResponse,

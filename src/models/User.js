@@ -29,7 +29,12 @@ const userSchema = new mongoose.Schema({
 		type: Boolean,
 		default: false
 	},
-	links: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Link' }]
+	templates: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Template' }],
+	tier: {
+		default: 'free',
+		enum: ['free', 'pro', 'business'],
+		required: true
+	}
 }, { timestamps: true })
 
 userSchema.index({ createdAt: 1 })
